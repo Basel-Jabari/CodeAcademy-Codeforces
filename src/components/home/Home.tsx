@@ -13,6 +13,7 @@ import {
 } from "../../services/storage";
 import ClearButton from "../clear-button/ClearButton";
 import Options from "../options/Options";
+import ProblemCheck from "../problem-check/ProblemCheck";
 import styled from "styled-components";
 import Footer from "../footer/Footer";
 import LogicalOperator from "../../models/LogicalOperator";
@@ -86,6 +87,7 @@ const Home: React.FC<Props> = (props: Props): ReactElement => {
         participantHandles={participantHandles}
         onParticipantHandlesChange={setParticipantHandles}
         onRandomize={randomizeProblem}
+        onError={triggerError}
       ></Options>
       <ProblemsSection problemsList={problemsList}></ProblemsSection>
 
@@ -93,6 +95,8 @@ const Home: React.FC<Props> = (props: Props): ReactElement => {
         onClick={clearProblemsHistory}
         disabled={problemsList.length === 0}
       ></ClearButton>
+
+      <ProblemCheck onError={triggerError}></ProblemCheck>
 
       <Footer></Footer>
 

@@ -5,6 +5,25 @@ interface Submission {
   problem: { contestId?: number; index?: string };
 }
 
+export type ProblemStatus = "accepted" | "attempted" | "untried";
+
+export interface HandleProblemStatus {
+  handle: string;
+  status: ProblemStatus;
+}
+
+// codeforces only sends a comment when it rejects the request itself,
+// so its absence means the network failed instead of the handle being wrong
+interface CodeforcesError extends Error {
+  apiComment?: string;
+}
+
+// a handle's whole public history, split once so both features reuse one fetch
+interface HandleHistory {
+  accepted: Set<string>;
+  attempted: Set<string>;
+}
+
 const statusUrl: string = "https://codeforces.com/api/user.status";
 const pageSize: number = 10000;
 
@@ -12,10 +31,10 @@ const pageSize: number = 10000;
 const requestIntervalMs: number = 2100;
 let nextRequestTime: number = 0;
 
-const acceptedProblemsCache: Map<string, Set<string>> = new Map();
+const historyCache: Map<string, HandleHistory> = new Map();
 
 export function getProblemKey(contestId: number, index: string): string {
-  return `${contestId}:${index}`;
+  return `${contestId}:${index.toUpperCase()}`;
 }
 
 export function parseHandles(handles: string): string[] {
@@ -48,33 +67,35 @@ async function getSubmissionsPage(
 ): Promise<Submission[]> {
   await waitForCodeforcesApiSlot();
 
+  let comment: string | undefined;
+
   try {
     const response = await axios.get(statusUrl, {
       params: { handle: handle, from: from, count: pageSize },
     });
 
-    if (response.data.status !== "OK") throw new Error(response.data.comment);
-
-    return response.data.result as Submission[];
+    if (response.data.status === "OK") return response.data.result as Submission[];
+    comment = response.data.comment;
   } catch (e) {
     // codeforces answers an unknown handle with 400 and an explanatory comment
-    const comment = e.response && e.response.data && e.response.data.comment;
-    throw new Error(
-      comment
-        ? `Could not load submissions for "${handle}": ${comment}`
-        : `Could not load submissions for "${handle}". Check the handle and your connection.`,
-    );
+    comment = e.response && e.response.data && e.response.data.comment;
   }
+
+  const error: CodeforcesError = new Error(
+    comment
+      ? `Could not load submissions for "${handle}": ${comment}`
+      : `Could not load submissions for "${handle}". Check the handle and your connection.`,
+  );
+  error.apiComment = comment;
+  throw error;
 }
 
-async function getAcceptedProblemsForHandle(
-  handle: string,
-): Promise<Set<string>> {
+async function getHandleHistory(handle: string): Promise<HandleHistory> {
   const cacheKey: string = handle.toLowerCase();
-  const cached: Set<string> | undefined = acceptedProblemsCache.get(cacheKey);
+  const cached: HandleHistory | undefined = historyCache.get(cacheKey);
   if (cached) return cached;
 
-  const acceptedProblems: Set<string> = new Set();
+  const history: HandleHistory = { accepted: new Set(), attempted: new Set() };
   let from: number = 1;
   let pageLength: number = pageSize;
 
@@ -85,13 +106,43 @@ async function getAcceptedProblemsForHandle(
 
     submissions.forEach((submission: Submission) => {
       const { contestId, index } = submission.problem;
-      if (submission.verdict === "OK" && contestId !== undefined && index)
-        acceptedProblems.add(getProblemKey(contestId, index));
+      if (contestId === undefined || !index) return;
+
+      const key: string = getProblemKey(contestId, index);
+      if (submission.verdict === "OK") history.accepted.add(key);
+      else history.attempted.add(key);
     });
   }
 
-  acceptedProblemsCache.set(cacheKey, acceptedProblems);
-  return acceptedProblems;
+  historyCache.set(cacheKey, history);
+  return history;
+}
+
+export interface HandleCheck {
+  handle: string;
+  ok: boolean;
+  message?: string;
+}
+
+// a handle only counts as valid once codeforces actually returns its history
+export async function verifyHandles(
+  handles: string[],
+): Promise<HandleCheck[]> {
+  const checks: HandleCheck[] = [];
+
+  for (const handle of handles) {
+    try {
+      await getHandleHistory(handle);
+      checks.push({ handle: handle, ok: true });
+    } catch (e) {
+      const apiComment: string | undefined = (e as CodeforcesError).apiComment;
+      // without a comment this is a connection problem, not a bad handle
+      if (!apiComment) throw e;
+      checks.push({ handle: handle, ok: false, message: apiComment });
+    }
+  }
+
+  return checks;
 }
 
 // problems accepted by any of the handles, so a single solver makes a problem ineligible
@@ -101,11 +152,30 @@ export async function getAcceptedProblemKeys(
   const acceptedProblems: Set<string> = new Set();
 
   for (const handle of handles) {
-    const handleProblems: Set<string> = await getAcceptedProblemsForHandle(
-      handle,
-    );
-    handleProblems.forEach((key: string) => acceptedProblems.add(key));
+    const history: HandleHistory = await getHandleHistory(handle);
+    history.accepted.forEach((key: string) => acceptedProblems.add(key));
   }
 
   return acceptedProblems;
+}
+
+export async function getHandleProblemStatuses(
+  handles: string[],
+  contestId: number,
+  index: string,
+): Promise<HandleProblemStatus[]> {
+  const key: string = getProblemKey(contestId, index);
+  const statuses: HandleProblemStatus[] = [];
+
+  for (const handle of handles) {
+    const history: HandleHistory = await getHandleHistory(handle);
+
+    let status: ProblemStatus = "untried";
+    if (history.accepted.has(key)) status = "accepted";
+    else if (history.attempted.has(key)) status = "attempted";
+
+    statuses.push({ handle: handle, status: status });
+  }
+
+  return statuses;
 }

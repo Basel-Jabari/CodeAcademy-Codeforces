@@ -4,9 +4,9 @@ import LogicalOperator from "../../models/LogicalOperator";
 import theme from "../../theme";
 
 const Button = styled.div<{ isSelected: boolean }>`
-  width: 60px;
-  padding: 4px 0;
-  margin: 0 4px;
+  min-width: 74px;
+  padding: 9px 14px;
+  margin: 0 7px;
   text-align: center;
   font-size: 13px;
   font-weight: 600;
@@ -14,7 +14,7 @@ const Button = styled.div<{ isSelected: boolean }>`
   cursor: pointer;
   user-select: none;
   transition: 0.3s;
-  border-radius: 4px;
+  border-radius: 7px;
   color: ${(props) => (props.isSelected ? theme.accentBright : theme.textMuted)};
   background-color: ${(props) =>
     props.isSelected ? theme.accentDeep : theme.surface};

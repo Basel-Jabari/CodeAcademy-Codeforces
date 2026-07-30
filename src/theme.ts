@@ -14,11 +14,15 @@ const theme = {
   accentDeep: "#1b4f8a",
   cyan: "#22d3ee",
   danger: "#ff4d6d",
+  success: "#2ee6a8",
+  warning: "#ffb84d",
 
   glow: "rgba(61, 155, 255, 0.55)",
   glowSoft: "rgba(61, 155, 255, 0.18)",
   cyanGlow: "rgba(34, 211, 238, 0.5)",
   dangerGlow: "rgba(255, 77, 109, 0.45)",
+  successGlow: "rgba(46, 230, 168, 0.35)",
+  warningGlow: "rgba(255, 184, 77, 0.35)",
 };
 
 export default theme;

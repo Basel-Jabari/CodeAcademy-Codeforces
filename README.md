@@ -1,134 +1,146 @@
 # Codeforces Randomizer
 
-Pick a random Codeforces problem by topic and difficulty — and optionally skip every problem
-your contestants have already solved.
+A simple browser tool for Codeforces.
 
-Built with React, TypeScript and styled-components. It talks directly to the public
-[Codeforces API](https://codeforces.com/apiHelp) from the browser, so there is no backend,
-no sign-in and no API key.
+- Pick a random problem by topic and rating
+- Skip problems your people already solved
+- Build status tables for a list of people and problems
 
-## Why
+No login. No API key.
 
-Two uses, one tool:
+Original project: https://github.com/KarimElghamry/Codeforces-Randomizer
 
-- **Practice.** Choose the tags you want to drill and a rating range, then pull a random
-  problem instead of scrolling the problemset.
-- **Contest preparation.** Paste the handles of everyone who will compete. Any problem that
-  at least one of them has already solved is filtered out, so you do not hand your
-  participants a problem half the room has seen before.
+---
 
-## Usage
+## Features
 
-1. **Pick topics.** Click any number of tags from the list. All current Codeforces tags are
-   available.
-2. **Choose how the tags combine.** See [tag matching modes](#tag-matching-modes) below.
-3. **Set the rating range.** The slider covers 800 to 3500 in steps of 100.
-4. **Optionally, list handles to exclude.** See [skipping solved problems](#skipping-solved-problems).
-5. **Press Randomize.** The result is added to a history list; click any entry to open the
-   problem on Codeforces.
+### 1. Random problem
 
-If you press Randomize with no topics selected, a random tag is chosen for you (except in
-`NOT` mode, where an empty selection correctly means "no exclusions", so the whole problemset
-stays in play).
+1. Click tags (example: `dp`, `graphs`)
+2. Choose a rating range (800–3500)
+3. Press **Randomize**
+4. Click a result card to open the problem on Codeforces
 
-Your history is saved in the browser's local storage, so it survives a reload. Clear it any
-time with the Clear button.
+History stays in your browser. Press **Clear** to remove it.
 
-### Tag matching modes
+**Tag modes**
 
-The four buttons above the slider decide how your selected tags are interpreted. Codeforces'
-API only supports one of these natively, so the rest are applied client-side.
+| Mode | Meaning |
+|---|---|
+| `AND` | Problem has **all** selected tags |
+| `OR` | Problem has **at least one** selected tag |
+| `ONLY` | Problem has **only** these tags |
+| `NOT` | Problem has **none** of these tags |
 
-| Mode | Returns problems that... | Example with `dp`, `greedy` |
-|---|---|---|
-| `AND` | carry **all** selected tags | tagged both `dp` and `greedy`, possibly more |
-| `OR` | carry **at least one** selected tag | tagged `dp`, or `greedy`, or both |
-| `ONLY` | carry the selected tags **and nothing else** | tagged exactly `dp` + `greedy` |
-| `NOT` | carry **none** of the selected tags | anything that is neither `dp` nor `greedy` |
+---
 
-`ONLY` is the strictest and `NOT` scans the entire problemset, so both return fewer results
-and take slightly longer.
+### 2. Skip solved problems (Randomize only)
 
-### Skipping solved problems
+This is the **first** handles box (above Randomize).
 
-Enter Codeforces handles in the text box under the slider, separated by commas, spaces or
-newlines. Before a problem is picked, each handle's public submission history is fetched and
-every problem with an accepted verdict is removed from the candidate pool.
+If you add handles there, Randomize will not suggest a problem that any of them already
+got **Accepted (OK)** on.
 
-Details worth knowing:
+- Type handles, or upload a `.txt` / `.csv` / `.tsv` file
+- Every non-empty cell becomes a handle
+- Leave empty if you do not want this filter
 
-- **One solver is enough.** If any single handle on the list solved a problem, it is excluded
-  for everyone.
-- **Only accepted counts.** A wrong answer, time limit exceeded, or abandoned attempt does
-  not disqualify a problem — only a green `OK`.
-- **Handles are case-insensitive** and duplicates are ignored.
-- **The first run is the slow one.** Codeforces permits one API request every two seconds, and
-  each handle needs at least one request. Results are cached for the rest of the session, so
-  re-rolling is instant.
-- **Leave it empty to disable it.** With no handles, no submission requests are made at all.
+This list is **only for Randomize**. The tables below use another list.
 
-Mistyped handles are reported back to you by name, and if your filters are so narrow that the
-participants have collectively solved everything matching, you get told that specifically
-rather than a generic "nothing found".
+---
 
-#### What it cannot see
+### 3. Problem status tables
 
-The filter reads **public submission history only**. It will not catch:
+At the bottom of the page. Uses its **own** handles box.
 
-- problems solved in a **Gym** or a **private group**
-- problems solved on an account whose activity is hidden in Codeforces privacy settings
-- problems solved on a **different account** than the handle you supplied
-- a Gym **clone or rewrite** of a problem — Codeforces exposes no clone/original relationship
-  through its API, so a rewritten duplicate is indistinguishable from an unseen problem
+1. Enter handles (or upload)
+2. Enter problems / links / ids like `2240A` (or upload)
+3. Press **Check**
 
-For a typical university contest this catches the large majority of repeats, but treat it as
-a strong filter rather than a guarantee.
+A handle is only added when Codeforces really has that account. Check asks Codeforces
+first, and:
 
-## Running locally
+- handles that exist → added to the tables and removed from the box
+- handles that are wrong, or do not exist on Codeforces → **stay in the box** with a message
 
-Requires [Node.js](https://nodejs.org/) and npm.
+Problems work the same way: valid ones move to the tables, invalid ones stay in the box.
+
+**Filters**
+
+- **Filter handles** and **Filter problems** buttons open a small panel
+- Search box on top, then a checkbox for every item (sorted: handles A → Z, problems by
+  contest number then letter)
+- Uncheck to hide an item from every table, from every count, and from the export
+- **Show all** / **Hide all** to change everything at once
+
+The header pills show how many handles and problems are shown, and the total when a
+filter hides something.
+
+After Check you get **5 tables**:
+
+| # | Table | Rows | Columns | Cells |
+|---|---|---|---|---|
+| 1 | By handle — status per problem | People | Problems | Accepted / Tried / Did not try |
+| 2 | By status — names | Accepted / Tried / Did not try | Problems | Names (or a fun empty message on screen) |
+| 3 | By status — counts | Same statuses | Problems | Count of people (`0` if empty) |
+| 4 | By handle — problems per status | People | Statuses | Problem ids for that person |
+| 5 | Totals per person | People | Statuses | How many in each status |
+
+**Sort**
+
+- Sort **columns** (problems): by contest number, then letter
+- Sort **rows** (people): A → Z
+- Names inside a cell are always A → Z, problem ids inside a cell are always sorted
+- No sort button for status labels (you can still drag them)
+
+**Drag**
+
+Every table has its **own** order. Dragging a header or a row in table 1 does not move
+anything in the other tables.
+
+- Drag problem headers to reorder that table's columns
+- Drag people rows to reorder that table's rows
+- Drag status rows / status columns to reorder them in that table
+
+**Delete**
+
+- Delete a problem → removed from all tables
+- Delete a person → removed from all tables
+
+**Export all tables**
+
+One Excel file (`.xls`) with **5 sheets** (pages), in the same order as the screen.
+
+In the export file, empty cells are `none` (not the on-screen fun messages).
+
+Each column is sized to its longest cell, so you should not need to widen anything by
+hand. Only the rows and columns that are currently shown are exported.
+
+---
+
+### Limits
+
+The app only sees **public** Codeforces history. It cannot see Gym solves, private groups,
+hidden activity, other accounts, or Gym copies of a problem.
+
+---
+
+## How to run
 
 ```bash
 npm install
 npm start
 ```
 
-The app opens at http://localhost:3000.
+Open http://localhost:3000
 
-| Script | Purpose |
-|---|---|
-| `npm start` | Development server with hot reload |
-| `npm run build` | Production build into `build/` |
-| `npm test` | Test runner in watch mode |
-| `npm run deploy` | Build, then publish `build/` to the `gh-pages` branch |
-
-The `start` and `build` scripts pass OpenSSL's legacy provider flag, which older
-`react-scripts` needs to run on modern Node versions.
-
-`homepage` in `package.json` is set to `"."`, so the build uses relative asset paths and works
-from any host or subpath without further configuration.
-
-## Project layout
-
-```text
-src/
-├── components/     UI, one folder per component
-├── models/         Problem, ProblemStatistics, LogicalOperator types
-└── services/
-    ├── problems.ts     fetches the problemset, applies tag/rating/solved filtering
-    ├── submissions.ts  fetches handles' accepted problems, API rate limiting, caching
-    ├── storage.ts      history in local storage
-    └── data.ts         tag list and rating bounds
+```bash
+npm run build
+npm run deploy
 ```
 
-Both Codeforces endpoints used — `problemset.problems` and `user.status` — are public and go
-through a shared throttle in `submissions.ts` that keeps requests at least two seconds apart.
-
-## Contributing
-
-Issues and pull requests are welcome. If you are proposing a feature, a short description of
-the use case helps.
+---
 
 ## Credits
 
-Based on the original project: https://github.com/KarimElghamry/Codeforces-Randomizer
+Based on: https://github.com/KarimElghamry/Codeforces-Randomizer
