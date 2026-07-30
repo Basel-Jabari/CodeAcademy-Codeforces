@@ -16,7 +16,7 @@ const StyledEmptySecion = styled.div`
 const EmptySection: React.FC<{}> = (): ReactElement => {
   return (
     <StyledEmptySecion>
-      <div>Choose topics and press Randomize</div>
+      <div>Build a tag expression and press Randomize</div>
       <div>to start adding problems</div>
     </StyledEmptySecion>
   );

@@ -4,7 +4,7 @@ import * as assets from '../../assets';
 import theme from '../../theme';
 
 const Container = styled.div`
-  margin: 30px 20px 10px 20px;
+  margin: 26px 20px 18px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;

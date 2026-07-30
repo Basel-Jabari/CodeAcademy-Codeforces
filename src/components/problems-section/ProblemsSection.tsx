@@ -12,10 +12,10 @@ interface Props {
 }
 
 const StyleProblemsSection = styled.div`
-  margin-top: 20px;
+  margin-top: 14px;
   height: 300px;
-  width: 500px;
-  overflow-y: scroll;
+  width: 100%;
+  overflow-y: auto;
   scrollbar-color: ${theme.borderBright} transparent;
   scrollbar-width: thin;
 
@@ -32,9 +32,6 @@ const StyleProblemsSection = styled.div`
     border-radius: 5px;
   }
 
-  @media screen and (max-width: 600px) {
-    width: 400px;
-  }
 `;
 
 const ProblemsSection: React.FC<Props> = (props: Props): ReactElement => {

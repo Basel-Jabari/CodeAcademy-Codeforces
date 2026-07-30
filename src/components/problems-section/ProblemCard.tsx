@@ -24,12 +24,13 @@ to{
 `;
 
 const StyledProblemCard = styled.div`
-  width: 90%;
-  min-height: 80px;
+  box-sizing: border-box;
+  width: calc(100% - 24px);
+  min-height: 72px;
   background-color: ${theme.surface};
   border: 1px solid ${theme.border};
   color: ${theme.text};
-  margin: 20px;
+  margin: 12px;
   display: flex;
   justify-content: space-evenly;
   align-items: center;

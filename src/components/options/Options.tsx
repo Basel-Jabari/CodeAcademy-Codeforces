@@ -3,9 +3,6 @@ import Slider from "../slider/Slider";
 import { minRating, maxRating } from "../../services/data";
 import RandomizeButton from "../randomize-button/RandomizeButton";
 import styled from "styled-components";
-import LogicalOperator from "../../models/LogicalOperator";
-import OptionsButton from "../options-button";
-import Row from "../common/Row";
 import OutlineButton from "../common/OutlineButton";
 import theme from "../../theme";
 import { parseHandles } from "../../services/submissions";
@@ -17,33 +14,36 @@ import {
 
 interface Props {
   onRandomize: Function;
-  onOperatorSelect: (operator: LogicalOperator) => void;
-  operator: LogicalOperator;
   participantHandles: string;
   onParticipantHandlesChange: (handles: string) => void;
   onError: (message: string) => void;
 }
 
-const Container = styled.div`
+const Card = styled.div`
+  box-sizing: border-box;
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 16px;
+  background-color: ${theme.surface};
+  border: 1px solid ${theme.border};
+  border-radius: 14px;
+  box-shadow: 0 0 26px ${theme.glowSoft};
 `;
 
-const operators: LogicalOperator[] = ["AND", "OR", "ONLY", "NOT"];
-
-const OperatorRow = styled(Row)`
-  flex-wrap: wrap;
-  gap: 4px;
-  margin: 26px 0 30px 0;
+const Title = styled.div`
+  align-self: flex-start;
+  font-size: 15px;
+  font-weight: 700;
+  color: ${theme.accentBright};
 `;
 
 const HandlesContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: min(440px, 90vw);
-  margin: 10px 0 20px 0;
+  width: 100%;
+  margin: 4px 0 20px 0;
 `;
 
 const HandlesHeader = styled.div`
@@ -66,6 +66,7 @@ const HandlesCount = styled.span`
 const HandlesHint = styled.span`
   margin-top: 8px;
   font-size: 12px;
+  line-height: 1.5;
   color: ${theme.textMuted};
 `;
 
@@ -75,9 +76,9 @@ const HandlesInput = styled.textarea`
   min-height: 70px;
   padding: 10px;
   color: ${theme.text};
-  background-color: ${theme.surface};
+  background-color: ${theme.background};
   border: 1px solid ${theme.border};
-  border-radius: 6px;
+  border-radius: 8px;
   font: inherit;
   font-size: 14px;
   resize: vertical;
@@ -147,22 +148,15 @@ const Options: React.FC<Props> = (props: Props): ReactElement => {
   };
 
   return (
-    <Container>
-      <OperatorRow>
-        {operators.map((value) => (
-          <OptionsButton
-            key={value}
-            opertator={value}
-            onClick={props.onOperatorSelect}
-            isSelected={props.operator === value}
-          />
-        ))}
-      </OperatorRow>
+    <Card>
+      <Title>Rating & participants</Title>
+
       <Slider
         minRating={rating.min}
         maxRating={rating.max}
         onChange={setRating}
       ></Slider>
+
       <HandlesContainer>
         <HandlesHeader>
           <HandlesLabel htmlFor="participant-handles">
@@ -185,9 +179,7 @@ const Options: React.FC<Props> = (props: Props): ReactElement => {
         <HandlesActions>
           <OutlineButton
             type="button"
-            onClick={() =>
-              fileInputRef.current && fileInputRef.current.click()
-            }
+            onClick={() => fileInputRef.current && fileInputRef.current.click()}
           >
             Upload list
           </OutlineButton>
@@ -201,14 +193,15 @@ const Options: React.FC<Props> = (props: Props): ReactElement => {
         <HandlesHint>
           Used only by Randomize: problems solved by any of these handles are
           skipped. Upload a .txt / .csv / .tsv — every non-empty cell becomes a
-          handle. The status tables below have their own handle list.
+          handle. The analyzer on the right keeps its own handle list.
         </HandlesHint>
       </HandlesContainer>
+
       <RandomizeButton
         isLoading={isLoading}
         onClick={randomizeProblem}
       ></RandomizeButton>
-    </Container>
+    </Card>
   );
 };
 
