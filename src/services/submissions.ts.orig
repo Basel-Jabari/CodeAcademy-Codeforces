@@ -1,0 +1,48 @@
+import axios from "axios";
+
+interface Submission {
+  verdict?: string;
+  problem: { contestId?: number; index?: string };
+}
+
+const statusUrl = "https://codeforces.com/api/user.status";
+const pageSize = 10000;
+const requestIntervalMs = 2100;
+let nextRequestTime = 0;
+
+function problemKey(contestId: number, index: string): string {
+  return `${contestId}:${index}`;
+}
+
+async function waitForApiSlot(): Promise<void> {
+  const requestTime = Math.max(Date.now(), nextRequestTime);
+  nextRequestTime = requestTime + requestIntervalMs;
+  const waitTime = requestTime - Date.now();
+  if (waitTime > 0) await new Promise((resolve) => setTimeout(resolve, waitTime));
+}
+
+export async function getAcceptedProblemKeys(handles: string[]): Promise<Set<string>> {
+  const acceptedProblems = new Set<string>();
+  const uniqueHandles = Array.from(new Set(handles.map((handle) => handle.trim()).filter(Boolean)));
+  for (const handle of uniqueHandles) {
+    let from = 1;
+    while (true) {
+      await waitForApiSlot();
+      const response = await axios.get(statusUrl, { params: { handle, from, count: pageSize } });
+      if (response.data.status !== "OK") throw new Error(`Could not load submissions for ${handle}.`);
+      const submissions = response.data.result as Submission[];
+      submissions.forEach((submission) => {
+        const { contestId, index } = submission.problem;
+        if (submission.verdict === "OK" && contestId !== undefined && index)
+          acceptedProblems.add(problemKey(contestId, index));
+      });
+      if (submissions.length < pageSize) break;
+      from += pageSize;
+    }
+  }
+  return acceptedProblems;
+}
+
+export function getProblemKey(contestId: number, index: string): string {
+  return problemKey(contestId, index);
+}

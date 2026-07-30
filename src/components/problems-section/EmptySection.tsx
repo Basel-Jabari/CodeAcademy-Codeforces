@@ -1,0 +1,25 @@
+import React, {ReactElement} from 'react';
+import styled from 'styled-components';
+import theme from '../../theme';
+
+const StyledEmptySecion = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  color: ${theme.textMuted};
+  font-size: 14px;
+`;
+
+const EmptySection: React.FC<{}> = (): ReactElement => {
+  return (
+    <StyledEmptySecion>
+      <div>Choose topics and press Randomize</div>
+      <div>to start adding problems</div>
+    </StyledEmptySecion>
+  );
+};
+
+export default EmptySection;

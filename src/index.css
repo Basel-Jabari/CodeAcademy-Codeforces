@@ -1,0 +1,39 @@
+@font-face {
+  font-family: Kanit;
+  src: url('../src/assets/Kanit.ttf');
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  color: #e8eefc;
+  background-color: #070b14;
+  font-family: Kanit;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color-scheme: dark;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  /* two dim blue light sources bleeding in from the top corners */
+  background-image: radial-gradient(
+      900px circle at 15% -10%,
+      rgba(61, 155, 255, 0.16),
+      transparent 60%
+    ),
+    radial-gradient(
+      700px circle at 85% 0%,
+      rgba(34, 211, 238, 0.1),
+      transparent 60%
+    );
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+::selection {
+  background-color: rgba(61, 155, 255, 0.35);
+}
