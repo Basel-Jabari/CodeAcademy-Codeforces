@@ -22,7 +22,6 @@ const StyledButton = styled.div<Props>`
   font-weight: 600;
   letter-spacing: 1px;
   border-radius: 6px;
-  user-select: none;
   cursor: pointer;
   transition-duration: 0.3s;
 

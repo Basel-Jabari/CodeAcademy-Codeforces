@@ -14,10 +14,25 @@ interface SnackbarProps {
 const StyledSnackbar = styled.div<SnackbarProps>`
   background-color: ${theme.surface};
   border: 1px solid
-    ${(props) => (props.type === "error" ? theme.danger : theme.accent)};
+    ${(props) =>
+      props.type === "error"
+        ? theme.danger
+        : props.type === "success"
+          ? theme.success
+          : theme.accent};
   box-shadow: 0 0 24px
-    ${(props) => (props.type === "error" ? theme.dangerGlow : theme.glow)};
-  color: ${(props) => (props.type === "error" ? theme.danger : theme.accent)};
+    ${(props) =>
+      props.type === "error"
+        ? theme.dangerGlow
+        : props.type === "success"
+          ? theme.successGlow
+          : theme.glow};
+  color: ${(props) =>
+    props.type === "error"
+      ? theme.danger
+      : props.type === "success"
+        ? theme.success
+        : theme.accent};
   opacity: ${(props) => (props.visible ? "1" : "0")};
   visibility: ${(props) => (props.visible ? "visible" : "hidden")};
   position: fixed;
@@ -36,7 +51,6 @@ const StyledSnackbar = styled.div<SnackbarProps>`
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  user-select: none;
   transition-duration: 0.5s;
 `;
 

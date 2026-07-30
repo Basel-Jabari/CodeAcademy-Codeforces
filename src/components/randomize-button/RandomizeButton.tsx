@@ -27,7 +27,6 @@ const StyledButton = styled.div<Props>`
   font-weight: 600;
   letter-spacing: 1px;
   border-radius: 6px;
-  user-select: none;
   cursor: ${(props) => (props.isLoading ? 'default' : 'pointer')};
   transition-duration: 0.3s;
 

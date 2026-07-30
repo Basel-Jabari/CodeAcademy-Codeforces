@@ -1,6 +1,6 @@
 {
-  "name": "codeforces-randomizer",
-  "version": "0.1.0",
+  "name": "codeforces-x-ppu",
+  "version": "0.2.0",
   "homepage": ".",
   "private": true,
   "dependencies": {
@@ -14,6 +14,8 @@
     "@types/react-dom": "^16.9.8",
     "@types/styled-components": "^5.1.0",
     "axios": "^0.19.2",
+    "baseline-browser-mapping": "^2.11.8",
+    "caniuse-lite": "^1.0.30001806",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-range": "^1.6.7",

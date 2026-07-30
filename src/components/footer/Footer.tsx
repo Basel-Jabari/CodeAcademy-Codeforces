@@ -9,16 +9,18 @@ const StyledFooter = styled.div`
   background-color: ${theme.surface};
   border-top: 1px solid ${theme.border};
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 2px;
+  padding: 6px 0;
   color: ${theme.textMuted};
   font-size: 14px;
-  user-select: none;
 `;
 
 const GithubLogo = styled.img`
-  width: 22px;
-  margin: 10px;
+  width: 20px;
+  margin: 6px 10px;
   opacity: 0.7;
 `;
 
@@ -36,15 +38,25 @@ const Link = styled(Row)`
   }
 `;
 
-const repositoryUrl: string =
+const originalRepositoryUrl: string =
   'https://github.com/KarimElghamry/Codeforces-Randomizer';
+
+const projectRepositoryUrl: string =
+  'https://github.com/Basel-Jabari/Codeforces-Randomizer';
 
 const Footer: React.FC = (): ReactElement => {
   return (
     <StyledFooter>
-      <Link onClick={() => window.open(repositoryUrl, '_blank')}>
+      <Link onClick={() => window.open(originalRepositoryUrl, '_blank')}>
         <GithubLogo src={images.githubLogo} alt=""></GithubLogo>
-        <div>Source</div>
+        <div>Codeforces Randomizer — Karim Elghamry</div>
+      </Link>
+      <Link onClick={() => window.open(projectRepositoryUrl, '_blank')}>
+        <GithubLogo src={images.githubLogo} alt=""></GithubLogo>
+        <div>
+          CodeAcademy-Codeforces — Basel Al-Jabari, Bara Wazwaz, Mohammed
+          Al-Shareef
+        </div>
       </Link>
     </StyledFooter>
   );

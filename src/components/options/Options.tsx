@@ -193,7 +193,7 @@ const Options: React.FC<Props> = (props: Props): ReactElement => {
         <HandlesHint>
           Used only by Randomize: problems solved by any of these handles are
           skipped. Upload a .txt / .csv / .tsv — every non-empty cell becomes a
-          handle. The analyzer on the right keeps its own handle list.
+          handle. Cross Analysis and Contest Builder keep their own lists.
         </HandlesHint>
       </HandlesContainer>
 

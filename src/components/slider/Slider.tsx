@@ -1,8 +1,10 @@
-import React, {ReactElement} from 'react';
+import React, {ReactElement, useState} from 'react';
 import {Range, getTrackBackground} from 'react-range';
 import styled from 'styled-components';
 import {minRating, maxRating} from '../../services/data';
 import theme from '../../theme';
+
+const RATING_STEP = 100;
 
 interface TrackProps {
   values: Array<number>;
@@ -71,8 +73,73 @@ const Label = styled.div`
   }
 `;
 
+const RatingValue = styled.span`
+  cursor: pointer;
+  border-bottom: 1px dashed transparent;
+
+  &:hover {
+    color: ${theme.cyan};
+    border-bottom-color: ${theme.cyan};
+  }
+`;
+
+const RatingInput = styled.input`
+  box-sizing: border-box;
+  width: 62px;
+  padding: 1px 4px;
+  color: ${theme.accentBright};
+  background-color: ${theme.background};
+  border: 1px solid ${theme.accent};
+  border-radius: 5px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+`;
+
+type Edge = 'min' | 'max';
+
 const Slider: React.FC<SliderProps> = (props: SliderProps): ReactElement => {
   const values = [props.minRating, props.maxRating];
+  const [editing, setEditing] = useState<Edge | null>(null);
+  const [draftValue, setDraftValue] = useState<string>('');
+
+  const roundToStep = (value: number): number => {
+    const stepped = Math.round(value / RATING_STEP) * RATING_STEP;
+    return Math.min(maxRating, Math.max(minRating, stepped));
+  };
+
+  const startEditing = (edge: Edge): void => {
+    setEditing(edge);
+    setDraftValue(String(edge === 'min' ? values[0] : values[1]));
+  };
+
+  const commitEdit = (): void => {
+    if (editing === null) return;
+    const parsed: number = parseInt(draftValue, 10);
+    if (!isNaN(parsed)) {
+      const stepped: number = roundToStep(parsed);
+      if (editing === 'min') {
+        props.onChange({min: Math.min(stepped, values[1]), max: values[1]});
+      } else {
+        props.onChange({min: values[0], max: Math.max(stepped, values[0])});
+      }
+    }
+    setEditing(null);
+  };
+
+  const cancelEdit = (): void => setEditing(null);
+
   return (
     <Container>
       <Range
@@ -95,7 +162,54 @@ const Slider: React.FC<SliderProps> = (props: SliderProps): ReactElement => {
         }}
       />
       <Label>
-        Rating: <span>{values[0]}</span> - <span>{values[1]}</span>
+        Rating:{' '}
+        {editing === 'min' ? (
+          <RatingInput
+            type="number"
+            autoFocus
+            min={minRating}
+            max={maxRating}
+            step={RATING_STEP}
+            value={draftValue}
+            onChange={(event) => setDraftValue(event.target.value)}
+            onBlur={commitEdit}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') commitEdit();
+              if (event.key === 'Escape') cancelEdit();
+            }}
+          ></RatingInput>
+        ) : (
+          <RatingValue
+            title="Click to type a custom minimum"
+            onClick={() => startEditing('min')}
+          >
+            {values[0]}
+          </RatingValue>
+        )}{' '}
+        -{' '}
+        {editing === 'max' ? (
+          <RatingInput
+            type="number"
+            autoFocus
+            min={minRating}
+            max={maxRating}
+            step={RATING_STEP}
+            value={draftValue}
+            onChange={(event) => setDraftValue(event.target.value)}
+            onBlur={commitEdit}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') commitEdit();
+              if (event.key === 'Escape') cancelEdit();
+            }}
+          ></RatingInput>
+        ) : (
+          <RatingValue
+            title="Click to type a custom maximum"
+            onClick={() => startEditing('max')}
+          >
+            {values[1]}
+          </RatingValue>
+        )}
       </Label>
     </Container>
   );

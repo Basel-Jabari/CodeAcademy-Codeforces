@@ -4,38 +4,74 @@ import * as assets from '../../assets';
 import theme from '../../theme';
 
 const Container = styled.div`
-  margin: 26px 20px 18px 20px;
+  margin: 26px 20px 12px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
 `;
 
-// the wordmark is dark artwork, so it is flattened to white and lit from behind
+const BrandRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 20px 28px;
+`;
+
+const BrandBlock = styled.a`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
+  line-height: 0;
+`;
+
 const Logo = styled.img`
+  height: 44px;
+  width: auto;
+  max-width: 220px;
+  object-fit: contain;
+  display: block;
   filter: brightness(0) invert(1) drop-shadow(0 0 14px ${theme.glow});
 `;
 
-const Title = styled.div`
-  margin-top: 6px;
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold;
-  letter-spacing: 6px;
-  text-transform: uppercase;
-  color: ${theme.accentBright};
-  text-shadow: 0 0 18px ${theme.glow};
+const Join = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  line-height: 1;
+  color: ${theme.cyan};
+  text-shadow: 0 0 14px ${theme.cyanGlow};
 `;
 
 const Header: React.FC = (): ReactElement => {
   return (
     <Container>
-      <Logo
-        width={300}
-        height={35}
-        src={assets.images.codeforcesLogo}
-        alt="Codeforces"
-      ></Logo>
-      <Title>Randomizer</Title>
+      <BrandRow>
+        <BrandBlock
+          href="https://codeforces.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Codeforces"
+        >
+          <Logo src={assets.images.codeforcesLogo} alt="Codeforces logo" />
+        </BrandBlock>
+
+        <Join>X</Join>
+
+        <BrandBlock
+          href="https://linktr.ee/PPUCodeAcademy12"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="PPU Code Academy"
+        >
+          <Logo src={assets.images.ppuccLogo} alt="PPU Code Academy logo" />
+        </BrandBlock>
+      </BrandRow>
     </Container>
   );
 };

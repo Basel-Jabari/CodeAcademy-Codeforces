@@ -1,213 +1,330 @@
-# Codeforces Randomizer
+# Codeforces X PPU
 
-A simple browser tool for Codeforces.
+Browser tools for **Palestine Polytechnic University** ([ppu.edu](https://ppu.edu/)), built on the public Codeforces API.
 
-- Pick a random problem with a tag expression you build yourself
-- Skip problems your people already solved
-- Build status tables for a list of people and problems
+Pick practice problems by tag logic, cross-check a group of people against a list of problems, and assemble a full custom contest — all client-side, no account or login required.
 
-No login. No API key.
-
-Original project: https://github.com/KarimElghamry/Codeforces-Randomizer
-
----
-
-## The page
-
-The screen is split in two halves:
-
-| Side | What it does |
-|---|---|
-| **Left — Randomizer** | tag expression, rating, handles, Randomize, picked problems |
-| **Right — Analyzer** | problem status tables for a list of people |
-
-On a narrow screen (or a phone) the two halves stack, randomizer first.
+![React](https://img.shields.io/badge/React-16.13-61dafb?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3.7-3178c6?logo=typescript&logoColor=white)
+![styled-components](https://img.shields.io/badge/styled--components-5.1-db7093?logo=styled-components&logoColor=white)
+![Codeforces API](https://img.shields.io/badge/Codeforces-public%20API-1f8acb)
 
 ---
 
-## Features
+## Contents
 
-### 1. Random problem
-
-1. Build a tag expression (see below)
-2. Choose a rating range (800–3500)
-3. Press **Randomize**
-4. Click a result card to open the problem on Codeforces
-
-History stays in your browser. Press **Clear** to remove it.
-
-If you leave the expression empty, Randomize picks one random tag for you.
-
----
-
-### 2. Tag expression
-
-Instead of one global mode, tags live in **blocks** you can nest freely:
-
-```
-dp AND implementation AND (graphs OR number theory) AND (NOT geometry)
-```
-
-**Blocks**
-
-| Level | Options | Meaning |
-|---|---|---|
-| Root | `STRICT` | match the expression; the problem may not carry any other tags |
-| Root | `LOOSE` | match the expression; other tags are fine |
-| Nested | `AND` | every item inside must match |
-| Nested | `OR` | at least one item inside must match |
-| Nested | `XOR` | exactly one item inside may match |
-| Nested | `NOT` | the single item inside must not match |
-
-`dp XOR greedy` keeps problems that have `dp` without `greedy`, or `greedy` without
-`dp`, and drops the ones that have both.
-
-Root children are joined with AND. `NOT` takes exactly one child.
-
-**Writing it by hand**
-
-The box above the palette is editable:
-
-```
-STRICT: dp AND implementation AND (graphs OR number theory) AND (NOT geometry)
-```
-
-- Start with `STRICT:` or `LOOSE:` (default is `LOOSE` if you omit it)
-- Press **Enter** (or **Apply**) to use it, **Esc** (or **Cancel**) to go back
-- Brackets nest as deep as you like
-- `AND` binds tighter than `XOR`, and `XOR` tighter than `OR`
-- `&` `|` `^` `!` also work as `AND` `OR` `XOR` `NOT`
-- Tag names with spaces are fine — `dfs and similar` is one tag
-
-The box always shows the current expression, so building with blocks updates the text and
-typing updates the blocks.
-
-**How to build with blocks**
-
-- Switch root between **STRICT** and **LOOSE** on the root card
-- **Drag** `AND` / `OR` / `XOR` / `NOT` from the palette into any block
-- **Drag** or **click** a tag from the searchable A→Z list
-- Blocks do **not** offer their own type buttons — pick the type from the palette above
-- **Drag** a block by its grip (`⣿`) to move it
-- `×` removes a tag or a whole block
-
-**Load example** fills in the expression above; **Clear expression** empties it.
-
-A block cannot be dropped inside itself, and if one group both requires and excludes the
-same tag you get a warning instead of an empty result.
-
-Because any expression is possible, the app downloads the problemset once per visit and
-does the filtering in your browser.
+- [Quick start](#quick-start)
+- [The three tabs](#the-three-tabs)
+  - [Problem Randomizer](#1-problem-randomizer)
+  - [Users-Problems Cross Analysis](#2-users-problems-cross-analysis)
+  - [Contest Builder](#3-contest-builder)
+- [Tag expression language](#tag-expression-language)
+- [Input formats](#input-formats)
+- [Data, APIs, and storage](#data-apis-and-storage)
+- [Project structure](#project-structure)
+- [Scripts](#scripts)
+- [Troubleshooting](#troubleshooting)
+- [Limitations](#limitations)
+- [Credits](#credits)
 
 ---
 
-### 3. Skip solved problems (Randomize only)
+## Quick start
 
-This is the handles box on the **left** side.
-
-If you add handles there, Randomize will not suggest a problem that any of them already
-got **Accepted (OK)** on.
-
-- Type handles, or upload a `.txt` / `.csv` / `.tsv` file
-- Every non-empty cell becomes a handle
-- Leave empty if you do not want this filter
-
-This list is **only for Randomize**. The analyzer uses another list.
-
----
-
-### 4. Problem status tables (Analyzer)
-
-The right half of the page. Uses its **own** handles box.
-
-1. Enter handles (or upload)
-2. Enter problems / links / ids like `2240A` (or upload)
-3. Press **Check**
-
-A handle is only added when Codeforces really has that account. Check asks Codeforces
-first, and:
-
-- handles that exist → added to the tables and removed from the box
-- handles that are wrong, or do not exist on Codeforces → **stay in the box** with a message
-
-Problems work the same way: valid ones move to the tables, invalid ones stay in the box.
-
-**Filters**
-
-- **Filter handles** and **Filter problems** buttons open a small panel
-- Search box on top, then a checkbox for every item (sorted: handles A → Z, problems by
-  contest number then letter)
-- Uncheck to hide an item from every table, from every count, and from the export
-- **Show all** / **Hide all** to change everything at once
-
-The header pills show how many handles and problems are shown, and the total when a
-filter hides something.
-
-After Check you get **5 tables**:
-
-| # | Table | Rows | Columns | Cells |
-|---|---|---|---|---|
-| 1 | By handle — status per problem | People | Problems | Accepted / Tried / Did not try |
-| 2 | By status — names | Accepted / Tried / Did not try | Problems | Names (or a fun empty message on screen) |
-| 3 | By status — counts | Same statuses | Problems | Count of people (`0` if empty) |
-| 4 | By handle — problems per status | People | Statuses | Problem ids for that person |
-| 5 | Totals per person | People | Statuses | How many in each status |
-
-**Sort**
-
-- Sort **columns** (problems): by contest number, then letter
-- Sort **rows** (people): A → Z
-- Names inside a cell are always A → Z, problem ids inside a cell are always sorted
-- No sort button for status labels (you can still drag them)
-
-**Drag**
-
-Every table has its **own** order. Dragging a header or a row in table 1 does not move
-anything in the other tables.
-
-- Drag problem headers to reorder that table's columns
-- Drag people rows to reorder that table's rows
-- Drag status rows / status columns to reorder them in that table
-
-**Delete**
-
-- Delete a problem → removed from all tables
-- Delete a person → removed from all tables
-
-**Export all tables**
-
-One Excel file (`.xls`) with **5 sheets** (pages), in the same order as the screen.
-
-In the export file, empty cells are `none` (not the on-screen fun messages).
-
-Each column is sized to its longest cell, so you should not need to widen anything by
-hand. Only the rows and columns that are currently shown are exported.
-
----
-
-### Limits
-
-The app only sees **public** Codeforces history. It cannot see Gym solves, private groups,
-hidden activity, other accounts, or Gym copies of a problem.
-
----
-
-## How to run
+**Requirements:** Node.js and npm. Any modern Node version works — the `--openssl-legacy-provider`
+flag is already baked into the scripts for Node 17+ (see [Troubleshooting](#troubleshooting)).
 
 ```bash
 npm install
-npm start
+npm start          # http://localhost:3000
 ```
 
-Open http://localhost:3000
+Production build and deploy to GitHub Pages:
 
 ```bash
-npm run build
-npm run deploy
+npm run build      # outputs to build/
+npm run deploy     # gh-pages -d build
 ```
+
+---
+
+## The three tabs
+
+### 1. Problem Randomizer
+
+Pull a random problem that matches a tag expression and a rating window.
+
+1. **Build a tag expression** — drag operators (`AND` / `OR` / `XOR` / `NOT`) and tags from the
+   palette, or type the expression directly in the text field (see
+   [Tag expression language](#tag-expression-language)). The tree and the text stay in sync.
+2. **Set the rating range** — drag the slider handles, or click either number to type an exact
+   value. Range is **800–3500** in steps of **100**.
+3. **Exclude solved problems (optional)** — paste or upload a list of handles under
+   *Participant handles*. Any problem already **Accepted** by any of those handles is skipped.
+4. Press **Randomize**.
+
+Results stack up in the **Picked problems** list (newest first) and survive a page reload —
+they're kept in `localStorage`. **Clear** empties the list.
+
+> If your expression contains no tags at all, a random tag is injected so you still get a
+> meaningful problem instead of the entire problemset.
+
+---
+
+### 2. Users-Problems Cross Analysis
+
+Cross-check any set of Codeforces handles against any set of problems, and get five different
+views of the same data.
+
+**Inputs**
+
+| Input | Accepts |
+|---|---|
+| **Import from contest link** | One or more **public** contest/gym URLs or numeric ids, separated by spaces, commas, or new lines. Pulls the **problem list only** — no participants. |
+| **Handles for cross analysis** | Handles separated by commas/whitespace, or an uploaded `.txt` / `.csv` / `.tsv` file. |
+| **Problems** | Problem URLs, `2240B`-style ids, or an uploaded list. |
+
+Press **Check**. Handles are verified against Codeforces first — anything that doesn't exist stays
+in the input box and is reported, so a single typo never silently skews the tables.
+
+**Every cell is one of three statuses:** `Accepted`, `Tried, not accepted`, or `Did not try`.
+
+**The five tables**
+
+| # | Table | Rows × Columns | Each cell holds |
+|---|---|---|---|
+| 1 | By handle — status per problem | handles × problems | that person's status |
+| 2 | By status — names | statuses × problems | who is in that status (A→Z) |
+| 3 | By status — counts | statuses × problems | how many people |
+| 4 | By handle — problems per status | handles × statuses | that person's problem list |
+| 5 | Totals per person | handles × statuses | how many problems |
+
+Each table keeps its **own** row and column order — dragging or sorting one never disturbs the
+others. Grab any row header or column header to drag it into place, use **Sort rows** (handles
+A→Z) and **Sort columns** (problems by contest then letter) where the table's shape allows it, and
+**Delete** a handle or problem straight from its header.
+
+**Filtering**
+
+- **Filter handles** — search box, show all / hide all, one checkbox per handle.
+- **Filter problems** — same, plus **problem groups**:
+  - Importing a contest automatically creates a group named after that contest and puts its
+    problems inside it. Import several contests and you get several groups.
+  - Each group has its own checkbox that shows/hides every problem inside it at once
+    (it renders as indeterminate when only part of the group is visible).
+  - Drag any problem between groups, or out into **Ungrouped**. Press **+ New group** to make
+    your own, then rename it inline; **Ungroup** dissolves a group and keeps its problems.
+  - If a problem you already added shows up in a newly imported contest, it moves into that
+    contest's group instead of being duplicated.
+
+**Export** — *Export all tables* downloads `problem-status-tables.xls`, one sheet per table,
+honouring whatever the filters are currently showing.
+
+---
+
+### 3. Contest Builder
+
+Assemble a custom contest from several independent randomizer rules.
+
+**Each problem slot** is a self-contained randomizer: its own tag expression, rating range,
+exclude-by-handle list, and a count of how many problems to pull (0–50). Slots can be:
+
+- **Renamed** — give a slot a meaningful name; otherwise it's numbered by its position.
+- **Duplicated** — clones the whole configuration and drops the copy right below.
+- **Folded** — collapse a configured slot down to a one-line summary.
+- **Reordered** — drag the ⠿ handle. Slot order is read fresh on every **Generate**, so
+  rearranging slots never disturbs a table you already generated.
+
+Press **Generate** (under the last slot) to build the contest. No problem is ever used twice
+across the whole contest, and any slot that matched nothing is listed in the failure report
+rather than silently dropped.
+
+**The results table**
+
+- Columns: *Codeforces id*, *Title*, *Rating*, *Tags*, *Count solved by*.
+- **Click a column header** to sort by it; click again to flip ascending/descending. Only one
+  column sorts at a time — clicking another column replaces the previous sort.
+- **Drag a column header** to move that column left or right.
+- **Drag a row** by its `#` handle to place it manually. This clears the active sort, since a
+  hand-picked order and a computed sort can't both be true at once.
+- **Shuffle order** randomizes the running order without changing which problems were picked.
+- Row numbers always reflect the current visual order.
+
+---
+
+## Tag expression language
+
+The palette and the text field are two views of the same expression tree, so you can start by
+dragging and finish by typing (or the other way round).
+
+**Operators**
+
+| Operator | Meaning | Text forms |
+|---|---|---|
+| `AND` | every child must match | `AND`, `&`, `&&`, `+`, `,` |
+| `OR` | at least one child matches | `OR`, `\|`, `\|\|` |
+| `XOR` | exactly one child matches | `XOR`, `^` |
+| `NOT` | its single child must **not** match | `NOT`, `!`, `~` |
+
+Precedence is `AND` > `XOR` > `OR`; use `( )` or `[ ]` to group explicitly. Nesting is unlimited.
+
+**Root mode** — one prefix decides how extra tags are treated:
+
+| Mode | Behaviour |
+|---|---|
+| `LOOSE:` *(default)* | the expression must match; the problem may carry other tags too |
+| `STRICT:` | the expression must match **and** the problem may carry no tag outside it |
+
+**Examples**
+
+| Expression | Matches |
+|---|---|
+| `LOOSE: dp AND implementation AND (graphs OR number theory) AND NOT geometry` | a dp + implementation problem that is also graph-theory or number-theory, but never geometry |
+| `STRICT: greedy, sortings` | problems tagged **exactly** greedy and sortings, nothing else |
+| `dp ^ greedy` | dp or greedy, but not both |
+| `!interactive & binary search` | binary search, excluding interactive problems |
+
+Tag names come from the 33 official Codeforces tags in `src/services/data.ts`; multi-word tags
+such as `dfs and similar` are matched as a single tag, not as `dfs AND similar`. Unknown words are
+rejected with a message instead of being silently ignored, and self-defeating expressions (a tag
+that is both required and excluded in the same group) raise a contradiction warning.
+
+---
+
+## Input formats
+
+**Handles** — separated by commas, semicolons, or whitespace; deduplicated case-insensitively.
+Uploads accept `.txt`, `.csv`, and `.tsv`.
+
+**Problems** — any of these work, mixed freely, one per line or comma-separated:
+
+```text
+2240A
+2240 A
+https://codeforces.com/contest/2240/problem/A
+https://codeforces.com/problemset/problem/2240/A
+https://codeforces.com/gym/102644/problem/B
+```
+
+**Contest links** — public contests and gyms, as URLs or bare ids, several at a time:
+
+```text
+https://codeforces.com/contest/2040, https://codeforces.com/gym/102644
+2043
+```
+
+All problem links rendered by the app point at the in-contest page
+(`codeforces.com/contest/{id}/problem/{index}`, or `/gym/...` for gyms).
+
+---
+
+## Data, APIs, and storage
+
+**Endpoints used** — all public, all unauthenticated:
+
+| Endpoint | Used for |
+|---|---|
+| `problemset.problems` | the full problemset and its `solvedCount` statistics |
+| `user.status` | a handle's submission history (paged, 10 000 per request) |
+| `contest.standings` | the problem list of a public contest or gym |
+
+**Rate limiting** — Codeforces allows roughly one request every two seconds per client, so every
+call in the app funnels through a single global gate (`waitForCodeforcesApiSlot` in
+`src/services/submissions.ts`) that spaces requests **2100 ms** apart. Large cross-analysis runs
+are therefore slow by design; the progress note under the buttons tells you which problem is
+currently loading.
+
+**Caching** — the problemset is fetched once per session and reused; each handle's submission
+history is cached in memory after its first fetch.
+
+**Storage** — the only persisted state is the Randomizer's picked-problem history, under the
+`problemsList` key in `localStorage`. Nothing is sent anywhere except to `codeforces.com`.
+
+---
+
+## Project structure
+
+```text
+src/
+├── components/
+│   ├── home/               # tab container, snackbar wiring
+│   ├── tabs/               # TabBar
+│   ├── randomizer/         # Problem Randomizer tab
+│   ├── problem-check/      # Users-Problems Cross Analysis tab
+│   ├── contest-builder/    # Contest Builder tab
+│   ├── expression/         # tag expression tree builder (drag & drop)
+│   ├── problems-section/   # picked-problem cards
+│   ├── slider/             # rating range slider
+│   ├── common/             # OutlineButton, Row, ProblemLinkText
+│   ├── header/ footer/ snackbar/ ...
+├── services/
+│   ├── data.ts             # tag list, rating bounds
+│   ├── problems.ts         # problemset fetch/cache, filtering, random picks
+│   ├── submissions.ts      # handle parsing/verification, status matrix, rate limiter
+│   ├── tagExpression.ts    # expression tree CRUD, evaluation, serialization
+│   ├── expressionParser.ts # text → expression tree
+│   ├── problemLink.ts      # problem id/URL parsing and link building
+│   ├── contestImport.ts    # public contest/gym problem import
+│   ├── handleList.ts       # handle list parsing and file upload
+│   ├── tableSort.ts        # sort + drag-reorder helpers
+│   ├── excelExport.ts      # multi-sheet .xls export
+│   └── storage.ts          # localStorage for the randomizer history
+├── models/                 # Problem, ProblemStatistics, TagExpression
+├── assets/ theme.ts        # logos, icons, font, colour palette
+└── App.tsx index.tsx
+```
+
+---
+
+## Scripts
+
+| Script | What it does |
+|---|---|
+| `npm start` | dev server on port 3000 |
+| `npm run build` | production build into `build/` |
+| `npm test` | Create React App test runner |
+| `npm run deploy` | build, then publish `build/` to the `gh-pages` branch |
+
+---
+
+## Troubleshooting
+
+**`error:0308010C:digital envelope routines::unsupported` on start or build**
+Already handled — both scripts pass `--openssl-legacy-provider`. This is needed because
+`react-scripts@3.4.1` ships webpack 4, which hashes with an algorithm OpenSSL 3 (Node 17+)
+disabled by default. If you run `react-scripts` directly, add the flag yourself.
+
+**Everything feels slow / requests appear to hang**
+That's the 2100 ms Codeforces rate gate. A cross-analysis of *N* problems makes at least
+*N* requests, so it takes at least `2.1 × N` seconds. The loading note shows current progress.
+
+**"handle not found on Codeforces"**
+The handle is verified through the API before it can enter the tables. Check the spelling — the
+rejected entries are left in the input box for exactly this reason.
+
+**A contest link won't import**
+Only public contests and gyms are supported. Private and group contests
+(`codeforces.com/group/.../contest/...`) are rejected by design.
+
+---
+
+## Limitations
+
+- Public Codeforces data only — there is no login, and no private or group contest support.
+- `contest.standings` imports **problems only**; participant lists are never fetched.
+- *Count attempted* is not exposed by `problemset.problems`, so only `solvedCount` is shown.
+- Gym copies of a problem may not share ids with the main problemset, so solves on one copy
+  won't necessarily line up with the other.
 
 ---
 
 ## Credits
 
-Based on: https://github.com/KarimElghamry/Codeforces-Randomizer
+Built on [Codeforces Randomizer](https://github.com/KarimElghamry/Codeforces-Randomizer) by
+**Karim Elghamry**.
+
+[CodeAcademy-Codeforces](https://github.com/Basel-Jabari/Codeforces-Randomizer) —
+**Basel Al-Jabari**, **Bara Wazwaz**, **Mohammed Al-Shareef**,
+for [Palestine Polytechnic University](https://ppu.edu/).
+
+Problem data courtesy of the [Codeforces API](https://codeforces.com/apiHelp).

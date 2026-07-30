@@ -4,6 +4,7 @@ import {Problem} from '../../models/Problem';
 import {ProblemStatistics} from '../../models/ProblemStatistics';
 import {images} from '../../assets';
 import theme from '../../theme';
+import {getProblemUrl} from '../../services/problemLink';
 
 interface CardProps {
   problem: Problem;
@@ -36,7 +37,6 @@ const StyledProblemCard = styled.div`
   align-items: center;
   border-radius: 10px;
   cursor: pointer;
-  user-select: none;
   transition-duration: 0.3s;
   animation: ${EnterAnim} 0.5s cubic-bezier(0.2, 0, 0, 1.2);
 
@@ -73,10 +73,12 @@ const SolvedCell = styled(Cell)`
 const ProblemCard: React.FC<CardProps> = (props: CardProps): ReactElement => {
   const problem: Problem = props.problem;
   const problemStats: ProblemStatistics = props.problemStatistics;
-  const baseUrl: string = 'https://codeforces.com/contest';
 
   const handleUrlRedirect = () => {
-    const redirectUrl: string = `${baseUrl}/${problem.contestId}/problem/${problem.index}`;
+    const redirectUrl: string = getProblemUrl({
+      contestId: problem.contestId,
+      index: problem.index,
+    });
     window.open(redirectUrl, '_blank');
   };
 
