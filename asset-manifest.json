@@ -1,27 +1,27 @@
 {
   "files": {
-    "main.css": "/static/css/main.fee71566.chunk.css",
-    "main.js": "/static/js/main.2e18de47.chunk.js",
-    "main.js.map": "/static/js/main.2e18de47.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.207db34a.js",
-    "runtime-main.js.map": "/static/js/runtime-main.207db34a.js.map",
-    "static/js/2.0182c2a5.chunk.js": "/static/js/2.0182c2a5.chunk.js",
-    "static/js/2.0182c2a5.chunk.js.map": "/static/js/2.0182c2a5.chunk.js.map",
-    "index.html": "/index.html",
-    "precache-manifest.2ea64d0481c6fdfba6954560dd878ef5.js": "/precache-manifest.2ea64d0481c6fdfba6954560dd878ef5.js",
-    "service-worker.js": "/service-worker.js",
-    "static/css/main.fee71566.chunk.css.map": "/static/css/main.fee71566.chunk.css.map",
-    "static/js/2.0182c2a5.chunk.js.LICENSE.txt": "/static/js/2.0182c2a5.chunk.js.LICENSE.txt",
-    "static/media/index.css": "/static/media/Kanit.a82c4c3b.ttf",
-    "static/media/codeforces_icon.png": "/static/media/codeforces_icon.3cb1864b.png",
-    "static/media/gh-logo.png": "/static/media/gh-logo.89c2c067.png",
-    "static/media/loop.43e3c67e.svg": "/static/media/loop.43e3c67e.svg",
-    "static/media/ppucc_icon.png": "/static/media/ppucc_icon.89fa8f79.png"
+    "main.css": "./static/css/main.a5421ce8.chunk.css",
+    "main.js": "./static/js/main.2e18de47.chunk.js",
+    "main.js.map": "./static/js/main.2e18de47.chunk.js.map",
+    "runtime-main.js": "./static/js/runtime-main.d33e08a7.js",
+    "runtime-main.js.map": "./static/js/runtime-main.d33e08a7.js.map",
+    "static/js/2.a52763e4.chunk.js": "./static/js/2.a52763e4.chunk.js",
+    "static/js/2.a52763e4.chunk.js.map": "./static/js/2.a52763e4.chunk.js.map",
+    "index.html": "./index.html",
+    "precache-manifest.3da6f32ce8416c1b56d6f9c9ffb6438c.js": "./precache-manifest.3da6f32ce8416c1b56d6f9c9ffb6438c.js",
+    "service-worker.js": "./service-worker.js",
+    "static/css/main.a5421ce8.chunk.css.map": "./static/css/main.a5421ce8.chunk.css.map",
+    "static/js/2.a52763e4.chunk.js.LICENSE.txt": "./static/js/2.a52763e4.chunk.js.LICENSE.txt",
+    "static/media/index.css": "./static/media/Kanit.a82c4c3b.ttf",
+    "static/media/codeforces_icon.png": "./static/media/codeforces_icon.3cb1864b.png",
+    "static/media/gh-logo.png": "./static/media/gh-logo.89c2c067.png",
+    "static/media/loop.43e3c67e.svg": "./static/media/loop.43e3c67e.svg",
+    "static/media/ppucc_icon.png": "./static/media/ppucc_icon.89fa8f79.png"
   },
   "entrypoints": [
-    "static/js/runtime-main.207db34a.js",
-    "static/js/2.0182c2a5.chunk.js",
-    "static/css/main.fee71566.chunk.css",
+    "static/js/runtime-main.d33e08a7.js",
+    "static/js/2.a52763e4.chunk.js",
+    "static/css/main.a5421ce8.chunk.css",
     "static/js/main.2e18de47.chunk.js"
   ]
 }
