@@ -597,28 +597,46 @@ const ContestBuilder: React.FC<Props> = (props: Props): ReactElement => {
     }
   };
 
+  // a "Link" column always rides right after "id", wherever the user has
+  // dragged that column to, since the on-screen id cell is itself a link
   const exportTable = (): void => {
-    const header: string[] = columnOrder.map(
-      (column: ColumnKey) => columnLabels[column],
-    );
+    const header: string[] = [];
+    columnOrder.forEach((column: ColumnKey) => {
+      header.push(columnLabels[column]);
+      if (column === "id") header.push("Link");
+    });
+
     const body: string[][] = displayRows.map((row: BuiltRow) => {
       const id = `${row.problem.contestId}${row.problem.index}`;
-      return columnOrder.map((column: ColumnKey): string => {
+      const link: string = getProblemUrl({
+        contestId: row.problem.contestId,
+        index: row.problem.index,
+      });
+
+      const cells: string[] = [];
+      columnOrder.forEach((column: ColumnKey) => {
         switch (column) {
           case "id":
-            return id;
+            cells.push(id);
+            cells.push(link);
+            break;
           case "title":
-            return row.problem.name;
+            cells.push(row.problem.name);
+            break;
           case "rating":
-            return row.problem.rating ? String(row.problem.rating) : "";
+            cells.push(row.problem.rating ? String(row.problem.rating) : "");
+            break;
           case "tags":
-            return (row.problem.tags || []).join(", ");
+            cells.push((row.problem.tags || []).join(", "));
+            break;
           case "solved":
-            return String(row.problemStatistics.solvedCount);
+            cells.push(String(row.problemStatistics.solvedCount));
+            break;
           default:
-            return "";
+            cells.push("");
         }
       });
+      return cells;
     });
 
     downloadExcelSheets("contest-problems.xls", [

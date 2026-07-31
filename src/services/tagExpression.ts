@@ -307,7 +307,10 @@ export function findContradiction(node: TagNode): string | null {
 
 export function connectorLabel(type: TagNode["type"]): string | null {
   if (type === "AND" || isRootMode(type)) return "AND";
-  if (type === "OR" || type === "XOR" || type === "OPTIONAL") return type;
+  if (type === "OR" || type === "XOR") return type;
+  // shown as "OR" (in the OPTIONAL block's own yellow accent) since it behaves
+  // like OR visually — the node itself is still an OPTIONAL type underneath
+  if (type === "OPTIONAL") return "OR";
   return null;
 }
 
