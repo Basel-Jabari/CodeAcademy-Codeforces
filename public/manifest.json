@@ -1,11 +1,11 @@
 {
-  "short_name": "CF X PPU",
-  "name": "Codeforces X PPU",
+  "short_name": "Code Academy X CF",
+  "name": "Code Academy X Codeforces",
   "icons": [
     {
       "src": "CRicon.png",
       "type": "image/png",
-      "sizes": "432x310"
+      "sizes": "256x256"
     }
   ],
   "start_url": ".",
