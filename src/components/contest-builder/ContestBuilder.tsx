@@ -498,7 +498,9 @@ const ContestBuilder: React.FC<Props> = (props: Props): ReactElement => {
           continue;
         }
 
-        result.picked.forEach((item) => {
+        // plain for-of (not a nested closure) so the shared rowSeq
+        // counter isn't captured by a function declared inside the loop
+        for (const item of result.picked) {
           const key: string = getProblemKey(
             item.problem.contestId,
             item.problem.index,
@@ -511,7 +513,7 @@ const ContestBuilder: React.FC<Props> = (props: Props): ReactElement => {
             problem: item.problem,
             problemStatistics: item.problemStatistics,
           });
-        });
+        }
 
         if (result.failureReason) {
           failures.push(`Slot ${i + 1}: ${result.failureReason}`);
