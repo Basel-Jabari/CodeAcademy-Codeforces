@@ -28,9 +28,8 @@ const BrandBlock = styled.a`
 `;
 
 const Logo = styled.img`
-  height: 44px;
+  height: 48px;
   width: auto;
-  max-width: 220px;
   object-fit: contain;
   display: block;
   filter: brightness(0) invert(1) drop-shadow(0 0 14px ${theme.glow});
@@ -53,23 +52,23 @@ const Header: React.FC = (): ReactElement => {
     <Container>
       <BrandRow>
         <BrandBlock
-          href="https://codeforces.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          title="Codeforces"
-        >
-          <Logo src={assets.images.codeforcesLogo} alt="Codeforces logo" />
-        </BrandBlock>
-
-        <Join>X</Join>
-
-        <BrandBlock
           href="https://linktr.ee/PPUCodeAcademy12"
           target="_blank"
           rel="noopener noreferrer"
           title="PPU Code Academy"
         >
-          <Logo src={assets.images.ppuccLogo} alt="PPU Code Academy logo" />
+          <Logo src={assets.images.ppuccIcon} alt="PPU Code Academy logo" />
+        </BrandBlock>
+
+        <Join>X</Join>
+
+        <BrandBlock
+          href="https://codeforces.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Codeforces"
+        >
+          <Logo src={assets.images.codeforcesIcon} alt="Codeforces logo" />
         </BrandBlock>
       </BrandRow>
     </Container>

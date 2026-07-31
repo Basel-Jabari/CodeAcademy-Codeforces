@@ -1,7 +1,7 @@
 {
   "name": "codeforces-x-ppu",
   "version": "0.2.0",
-  "homepage": ".",
+  "homepage": "http://.",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
@@ -47,7 +47,19 @@
     ]
   },
   "devDependencies": {
+    "@types/babel__traverse": "^7.11.0",
     "@types/react-rangeslider": "^2.2.2",
     "gh-pages": "^3.0.0"
+  },
+  "description": "Browser tools for [**PPU Code Academy**](<https://linktr.ee/PPUCodeAcademy12>), built on the public Codeforces API.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Basel-Jabari/Codeforces-Randomizer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Basel-Jabari/Codeforces-Randomizer/issues"
   }
 }
