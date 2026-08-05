@@ -8,7 +8,11 @@ import RandomizerTab from "../randomizer/RandomizerTab";
 import ProblemCheck from "../problem-check/ProblemCheck";
 import ContestBuilder from "../contest-builder/ContestBuilder";
 import { Problem } from "../../models/Problem";
-import { MangaAtmosphere, ChapterBanner } from "../effects/MangaAtmosphere";
+import {
+  ChapterAtmosphere,
+  ChapterBanner,
+  ChapterStage,
+} from "../effects/ChapterExperience";
 import { themeVariables } from "../../themePalettes";
 import { ProblemStatistics } from "../../models/ProblemStatistics";
 
@@ -31,7 +35,7 @@ const Page = styled.div`
   overflow: hidden;
   color: var(--cf-text);
   background-color: var(--cf-bg);
-  transition: color 0.45s ease, background-color 0.45s ease;
+  transition: color 0.7s ease, background-color 0.7s ease;
 `;
 
 const Content = styled.div`
@@ -69,29 +73,31 @@ const Home: React.FC<Props> = (props: Props): ReactElement => {
 
   return (
     <Page style={themeVariables(tab) as React.CSSProperties} data-theme={tab}>
-      <MangaAtmosphere kind={tab}></MangaAtmosphere>
+      <ChapterAtmosphere kind={tab}></ChapterAtmosphere>
       <BrandHeader></BrandHeader>
       <ServiceNavigation active={tab} onChange={setTab}></ServiceNavigation>
       <ChapterBanner kind={tab}></ChapterBanner>
 
       <Content>
-        {tab === "randomizer" ? (
-          <RandomizerTab
-            initialProblemsList={props.initialProblemsList}
-            onError={triggerError}
-          ></RandomizerTab>
-        ) : null}
+        <ChapterStage key={tab} kind={tab}>
+          {tab === "randomizer" ? (
+            <RandomizerTab
+              initialProblemsList={props.initialProblemsList}
+              onError={triggerError}
+            ></RandomizerTab>
+          ) : null}
 
-        {tab === "crossAnalysis" ? (
-          <ProblemCheck
-            onError={triggerError}
-            onSuccess={triggerSuccess}
-          ></ProblemCheck>
-        ) : null}
+          {tab === "crossAnalysis" ? (
+            <ProblemCheck
+              onError={triggerError}
+              onSuccess={triggerSuccess}
+            ></ProblemCheck>
+          ) : null}
 
-        {tab === "contestBuilder" ? (
-          <ContestBuilder onError={triggerError}></ContestBuilder>
-        ) : null}
+          {tab === "contestBuilder" ? (
+            <ContestBuilder onError={triggerError}></ContestBuilder>
+          ) : null}
+        </ChapterStage>
       </Content>
 
       <Footer></Footer>
