@@ -1,5 +1,5 @@
-import { getProblemUrl, ProblemReference } from "./problemLink";
-import { waitForCodeforcesApiSlot } from "./submissions";
+import { getProblemUrl, ProblemReference } from "@/utils/problemLink";
+import { waitForCodeforcesApiSlot } from "@/services/submissions";
 
 export type ContestKind = "official" | "publicGym" | "unknown";
 

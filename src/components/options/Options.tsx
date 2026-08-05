@@ -1,208 +1,114 @@
-import React, { ReactElement, useRef, useState } from "react";
-import Slider from "../slider/Slider";
-import { minRating, maxRating } from "../../services/data";
-import RandomizeButton from "../randomize-button/RandomizeButton";
-import styled from "styled-components";
-import OutlineButton from "../common/OutlineButton";
-import theme from "../../theme";
-import { parseHandles } from "../../services/submissions";
-import {
-  formatHandleList,
-  parseHandleList,
-  readFileAsText,
-} from "../../services/handleList";
+'use client';
+
+import React, { useRef, useState } from 'react';
+
+import OutlineButton from '@/components/common/OutlineButton';
+import RandomizeButton from '@/components/randomize-button/RandomizeButton';
+import Slider from '@/components/slider/Slider';
+import { parseHandles } from '@/services/submissions';
+import { minRating, maxRating } from '@/utils/data';
+import { formatHandleList, parseHandleList, readFileAsText } from '@/utils/handleList';
+
+import styles from './Options.module.css';
 
 interface Props {
-  onRandomize: Function;
+  onRandomize: (rating: { min: number; max: number }) => Promise<void> | void;
   participantHandles: string;
   onParticipantHandlesChange: (handles: string) => void;
   onError: (message: string) => void;
 }
 
-const Card = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  padding: 16px;
-  background-color: ${theme.surface};
-  border: 1px solid ${theme.border};
-  border-radius: 14px;
-  box-shadow: 0 0 26px ${theme.glowSoft};
-`;
-
-const Title = styled.div`
-  align-self: flex-start;
-  font-size: 15px;
-  font-weight: 700;
-  color: ${theme.accentBright};
-`;
-
-const HandlesContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin: 4px 0 20px 0;
-`;
-
-const HandlesHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-`;
-
-const HandlesLabel = styled.label`
-  font-size: 14px;
-  color: ${theme.text};
-`;
-
-const HandlesCount = styled.span`
-  font-size: 12px;
-  color: ${theme.accentBright};
-`;
-
-const HandlesHint = styled.span`
-  margin-top: 8px;
-  font-size: 12px;
-  line-height: 1.5;
-  color: ${theme.textMuted};
-`;
-
-const HandlesInput = styled.textarea`
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 70px;
-  padding: 10px;
-  color: ${theme.text};
-  background-color: ${theme.background};
-  border: 1px solid ${theme.border};
-  border-radius: 8px;
-  font: inherit;
-  font-size: 14px;
-  resize: vertical;
-  transition: 0.3s;
-
-  &::placeholder {
-    color: ${theme.textMuted};
-  }
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.accent};
-    box-shadow: 0 0 14px ${theme.glowSoft};
-  }
-`;
-
-const HandlesActions = styled.div`
-  display: flex;
-  align-items: center;
-  margin-top: 8px;
-`;
-
-const HiddenFileInput = styled.input`
-  display: none;
-`;
-
-const Options: React.FC<Props> = (props: Props): ReactElement => {
+export default function Options(props: Props) {
   const [rating, setRating] = useState<{ min: number; max: number }>({
     min: minRating,
     max: maxRating,
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleCount: number = parseHandles(props.participantHandles).length;
+  const parsedHandles = parseHandles(props.participantHandles);
+  const handleCount = parsedHandles.length;
 
-  const randomizeProblem = async () => {
-    setIsLoading(true);
-    await props.onRandomize(rating);
-    setIsLoading(false);
+  const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    props.onParticipantHandlesChange(event.target.value);
   };
 
-  const uploadHandleList = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const input: HTMLInputElement = event.target;
-    const file: File | null = input.files && input.files[0];
-    // clearing the value lets the same file be picked again later
-    input.value = "";
-    if (!file) return;
+  const triggerImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
     try {
-      const uploaded: string[] = parseHandleList(await readFileAsText(file));
+      const content = await readFileAsText(files[0]);
+      const importedHandles = parseHandleList(content);
+      const updatedList = Array.from(new Set([...parsedHandles, ...importedHandles]));
+      props.onParticipantHandlesChange(formatHandleList(updatedList));
+    } catch (e: unknown) {
+      const err = e as Error;
+      props.onError(err.message || 'Failed to read file.');
+    } finally {
+      event.target.value = '';
+    }
+  };
 
-      if (uploaded.length === 0) {
-        props.onError(`No handles found in ${file.name}.`);
-        return;
-      }
-
-      const merged: string[] = parseHandles(
-        `${props.participantHandles}, ${formatHandleList(uploaded)}`,
-      );
-      props.onParticipantHandlesChange(formatHandleList(merged));
-    } catch (e) {
-      props.onError(e.message);
+  const handleRandomizeClick = async () => {
+    setIsLoading(true);
+    try {
+      await props.onRandomize(rating);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <Card>
-      <Title>Rating & participants</Title>
+    <div className={styles.card}>
+      <div className={styles.title}>Options</div>
 
       <Slider
         minRating={rating.min}
         maxRating={rating.max}
-        onChange={setRating}
-      ></Slider>
+        onChange={(newRating) => setRating(newRating)}
+      />
 
-      <HandlesContainer>
-        <HandlesHeader>
-          <HandlesLabel htmlFor="participant-handles">
-            Participant handles (optional)
-          </HandlesLabel>
-          {handleCount > 0 ? (
-            <HandlesCount>
-              {handleCount} {handleCount === 1 ? "handle" : "handles"}
-            </HandlesCount>
-          ) : null}
-        </HandlesHeader>
-        <HandlesInput
+      <div className={styles.handlesContainer}>
+        <div className={styles.handlesHeader}>
+          <label className={styles.handlesLabel} htmlFor="participant-handles">
+            Exclude Solved Problems For (Codeforces Handles)
+          </label>
+          <span className={styles.handlesCount}>
+            {handleCount} {handleCount === 1 ? 'handle' : 'handles'}
+          </span>
+        </div>
+
+        <textarea
           id="participant-handles"
-          placeholder="_Basel_, Momen-G-Ar, mohammad_shareef, Mr.Belal, NitronBeam"
+          className={styles.handlesInput}
+          placeholder="e.g. Tourist, Petr, MikeMirzayanov (comma or newline separated)"
           value={props.participantHandles}
-          onChange={(event) =>
-            props.onParticipantHandlesChange(event.target.value)
-          }
-        ></HandlesInput>
-        <HandlesActions>
-          <OutlineButton
-            type="button"
-            onClick={() => fileInputRef.current && fileInputRef.current.click()}
-          >
-            Upload list
-          </OutlineButton>
-          <HiddenFileInput
+          onChange={handleTextareaChange}
+        />
+
+        <div className={styles.handlesActions}>
+          <OutlineButton onClick={triggerImportClick}>Import Handles from File</OutlineButton>
+          <input
             ref={fileInputRef}
             type="file"
-            accept=".txt,.csv,.tsv,text/plain,text/csv"
-            onChange={uploadHandleList}
-          ></HiddenFileInput>
-        </HandlesActions>
-        <HandlesHint>
-          Used only by Randomize: problems solved by any of these handles are
-          skipped. Upload a .txt / .csv / .tsv — every non-empty cell becomes a
-          handle. Cross Analysis and Contest Builder keep their own lists.
-        </HandlesHint>
-      </HandlesContainer>
+            accept=".txt,.csv"
+            className={styles.hiddenFileInput}
+            onChange={handleFileChange}
+          />
+        </div>
 
-      <RandomizeButton
-        isLoading={isLoading}
-        onClick={randomizeProblem}
-      ></RandomizeButton>
-    </Card>
+        <span className={styles.handlesHint}>
+          Import a text file containing handle names (one per line or separated by commas). Duplicate
+          handles will automatically be merged.
+        </span>
+      </div>
+
+      <RandomizeButton isLoading={isLoading} onClick={handleRandomizeClick} />
+    </div>
   );
-};
-
-export default Options;
+}

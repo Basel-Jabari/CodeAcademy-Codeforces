@@ -1,19 +1,19 @@
-import { Problem } from "../models/Problem";
-import { ProblemStatistics } from "../models/ProblemStatistics";
-import { TagNode } from "../models/TagExpression";
-import { getTags } from "./data";
+import { Problem } from "@/types/Problem";
+import { ProblemStatistics } from "@/types/ProblemStatistics";
+import { TagNode } from "@/types/TagExpression";
+import { getTags } from "@/utils/data";
 import {
   countTags,
   createRootNode,
   createTagNode,
   evaluateExpression,
   findContradiction,
-} from "./tagExpression";
+} from "@/utils/tagExpression";
 import {
   getAcceptedProblemKeys,
   getProblemKey,
   waitForCodeforcesApiSlot,
-} from "./submissions";
+} from "@/services/submissions";
 
 const baseUrl: string = "https://codeforces.com/api/problemset.problems";
 

@@ -1,0 +1,10 @@
+.problemLinkText {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dashed #8595b4;
+}
+
+.problemLinkText:hover {
+  color: #78c0ff;
+  border-bottom-color: #78c0ff;
+}

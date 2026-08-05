@@ -1,5 +1,5 @@
-import {Problem} from '../models/Problem';
-import {ProblemStatistics} from '../models/ProblemStatistics';
+import { Problem } from '@/types/Problem';
+import { ProblemStatistics } from '@/types/ProblemStatistics';
 
 // Bump the version whenever a saved shape changes, so an old browser cache
 // can never feed outdated data into a newer screen.

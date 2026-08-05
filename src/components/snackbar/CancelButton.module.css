@@ -1,0 +1,23 @@
+.cancelButton {
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  font-weight: bold;
+  font-size: 13px;
+  background-color: transparent;
+  border: 1px solid #1e2c4a;
+  color: #8595b4;
+  margin-left: 12px;
+  flex-shrink: 0;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.cancelButton:hover {
+  border-color: #2c4470;
+  color: #e8eefc;
+}

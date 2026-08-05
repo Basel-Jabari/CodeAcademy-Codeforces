@@ -1,11 +1,11 @@
-import { ExprType, RootMode, TagNode } from "../models/TagExpression";
-import { getTags } from "./data";
+import { ExprType, RootMode, TagNode } from "@/types/TagExpression";
+import { getTags } from "@/utils/data";
 import {
   createDefaultExpression,
   createExprNode,
   createRootNode,
   createTagNode,
-} from "./tagExpression";
+} from "@/utils/tagExpression";
 
 // longest tag first, so "dfs and similar" is one tag, not "dfs" AND "similar"
 const knownTags: string[] = getTags()

@@ -1,25 +1,12 @@
-import React, {ReactElement} from 'react';
-import styled from 'styled-components';
-import theme from '../../theme';
+'use client';
 
-const StyledEmptySecion = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  color: ${theme.textMuted};
-  font-size: 14px;
-`;
+import styles from './EmptySection.module.css';
 
-const EmptySection: React.FC<{}> = (): ReactElement => {
+export default function EmptySection() {
   return (
-    <StyledEmptySecion>
+    <div className={styles.emptySection}>
       <div>Build a tag expression and press Randomize</div>
       <div>to start adding problems</div>
-    </StyledEmptySecion>
+    </div>
   );
-};
-
-export default EmptySection;
+}

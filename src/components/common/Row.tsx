@@ -1,11 +1,10 @@
-import styled from 'styled-components';
+'use client';
 
-const Row = styled.div`
-  display: flex;
-  width: 100%;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-`;
+import { HTMLAttributes } from 'react';
+import styles from './Row.module.css';
 
-export default Row;
+export default function Row(props: HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div {...props} className={`${styles.row} ${props.className ?? ''}`} />
+  );
+}

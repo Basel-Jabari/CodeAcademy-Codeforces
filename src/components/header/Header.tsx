@@ -1,78 +1,52 @@
-import React, {ReactElement} from 'react';
-import styled from 'styled-components';
-import * as assets from '../../assets';
-import theme from '../../theme';
+'use client';
 
-const Container = styled.div`
-  margin: 26px 20px 12px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
+import Image from 'next/image';
+import Link from 'next/link';
 
-const BrandRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 20px 28px;
-`;
+import * as assets from '@/assets';
 
-const BrandBlock = styled.a`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  color: inherit;
-  line-height: 0;
-`;
+import styles from './Header.module.css';
 
-const Logo = styled.img`
-  height: 48px;
-  width: auto;
-  object-fit: contain;
-  display: block;
-  filter: brightness(0) invert(1) drop-shadow(0 0 14px ${theme.glow});
-`;
-
-const Join = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  line-height: 1;
-  color: ${theme.cyan};
-  text-shadow: 0 0 14px ${theme.cyanGlow};
-`;
-
-const Header: React.FC = (): ReactElement => {
+export default function Header() {
   return (
-    <Container>
-      <BrandRow>
-        <BrandBlock
+    <div className={styles.container}>
+      <div className={styles.brandRow}>
+        <Link
+          className={styles.brandBlock}
           href="https://linktr.ee/PPUCodeAcademy12"
           target="_blank"
           rel="noopener noreferrer"
           title="PPU Code Academy"
         >
-          <Logo src={assets.images.ppuccIcon} alt="PPU Code Academy logo" />
-        </BrandBlock>
+          <Image
+            className={styles.logo}
+            src={assets.images.ppuccIcon}
+            alt="PPU Code Academy logo"
+            width={180}
+            height={48}
+            priority
+          />
+        </Link>
 
-        <Join>X</Join>
+        <div className={styles.join}>X</div>
 
-        <BrandBlock
+        <Link
+          className={styles.brandBlock}
           href="https://codeforces.com/"
           target="_blank"
           rel="noopener noreferrer"
           title="Codeforces"
         >
-          <Logo src={assets.images.codeforcesIcon} alt="Codeforces logo" />
-        </BrandBlock>
-      </BrandRow>
-    </Container>
+          <Image
+            className={styles.logo}
+            src={assets.images.codeforcesIcon}
+            alt="Codeforces logo"
+            width={180}
+            height={48}
+            priority
+          />
+        </Link>
+      </div>
+    </div>
   );
-};
-
-export default Header;
+}

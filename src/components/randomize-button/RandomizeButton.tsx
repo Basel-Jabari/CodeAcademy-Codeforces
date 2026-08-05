@@ -1,73 +1,28 @@
-import React, {ReactElement} from 'react';
-import styled from 'styled-components';
+'use client';
+
 import LoadingIndicator from './LoadingIndicator';
-import {images} from '../../assets';
-import theme from '../../theme';
+import { LoopIcon } from '../../assets/LoopIcon';
+import styles from './RandomizeButton.module.css';
 
 interface Props {
-  isLoading: boolean;
-  onClick: Function;
+  isLoading?: boolean;
+  onClick: () => void;
 }
 
-const StyledButton = styled.div<Props>`
-  padding: 2px;
-  width: 150px;
-  height: 38px;
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  background: ${(props) =>
-    props.isLoading
-      ? theme.surface
-      : `linear-gradient(135deg, ${theme.accentDeep}, ${theme.accent})`};
-  border: 1px solid ${(props) => (props.isLoading ? theme.border : theme.accent)};
-  box-shadow: ${(props) =>
-    props.isLoading ? 'none' : `0 0 18px ${theme.glow}`};
-  color: white;
-  font-weight: 600;
-  letter-spacing: 1px;
-  border-radius: 6px;
-  cursor: ${(props) => (props.isLoading ? 'default' : 'pointer')};
-  transition-duration: 0.3s;
-
-  &:hover {
-    box-shadow: ${(props) =>
-      props.isLoading ? 'none' : `0 0 28px ${theme.glow}`};
-    border-color: ${(props) =>
-      props.isLoading ? theme.border : theme.accentBright};
-  }
-`;
-
-const LoopIcon = images.loopIcon;
-const StyledLoopIcon = styled(LoopIcon)`
-  height: 22px;
-  width: 22px;
-  fill: white;
-`;
-
-const RandomizeButton: React.FC<Props> = (props: Props): ReactElement => {
+export default function RandomizeButton({ isLoading = false, onClick }: Props) {
   return (
-    <StyledButton
-      isLoading={props.isLoading}
-      onClick={() => {
-        if (props.isLoading) return;
-        props.onClick();
-      }}
+    <div
+      className={`${styles.button} ${isLoading ? styles.buttonLoading : ''}`}
+      onClick={() => { if (!isLoading) onClick(); }}
     >
-      {props.isLoading ? (
-        <LoadingIndicator></LoadingIndicator>
+      {isLoading ? (
+        <LoadingIndicator />
       ) : (
-        <React.Fragment>
-          <StyledLoopIcon></StyledLoopIcon>
+        <>
+          <LoopIcon className={styles.loopIcon} />
           <div>Randomize</div>
-        </React.Fragment>
+        </>
       )}
-    </StyledButton>
+    </div>
   );
-};
-
-RandomizeButton.defaultProps = {
-  isLoading: false,
-};
-
-export default RandomizeButton;
+}

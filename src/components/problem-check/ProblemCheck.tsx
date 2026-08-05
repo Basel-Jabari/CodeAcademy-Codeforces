@@ -1,39 +1,39 @@
-import React, { ReactElement, useRef, useState } from "react";
-import styled from "styled-components";
+'use client';
+
+import React, { useRef, useState } from 'react';
+
+import OutlineButton from '@/components/common/OutlineButton';
+import ProblemLinkText from '@/components/common/ProblemLinkText';
+import {
+  ContestImportResult,
+  ContestProblemImport,
+  importContestFromLink,
+} from '@/services/contestImport';
 import {
   getHandleProblemStatuses,
   HandleCheck,
   HandleProblemStatus,
   ProblemStatus,
   verifyHandles,
-} from "../../services/submissions";
+} from '@/services/submissions';
+import { downloadExcelSheets } from '@/utils/excelExport';
+import { parseHandleListDetailed, readFileAsText } from '@/utils/handleList';
+import { usePersistentState } from '@/utils/persistentState';
 import {
   getProblemKey,
   getProblemLabel,
   getProblemUrl,
   parseProblemList,
   ProblemReference,
-} from "../../services/problemLink";
-import {
-  parseHandleListDetailed,
-  readFileAsText,
-} from "../../services/handleList";
-import { downloadExcelSheets } from "../../services/excelExport";
+} from '@/utils/problemLink';
 import {
   moveItem,
   sortHandlesAz,
   sortNamesAz,
   sortProblemsByNumberThenLetter,
-} from "../../services/tableSort";
-import {
-  importContestFromLink,
-  ContestImportResult,
-  ContestProblemImport,
-} from "../../services/contestImport";
-import OutlineButton from "../common/OutlineButton";
-import ProblemLinkText from "../common/ProblemLinkText";
-import theme from "../../theme";
-import { usePersistentState } from "../../services/persistentState";
+} from '@/utils/tableSort';
+
+import styles from './ProblemCheck.module.css';
 
 interface Props {
   onError: (message: string) => void;

@@ -1,0 +1,47 @@
+.indicator {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+@keyframes bounceAnim {
+  from {
+    bottom: 5px;
+  }
+  to {
+    bottom: 15px;
+  }
+}
+
+.circle {
+  position: absolute;
+  display: inline-block;
+  height: 10px;
+  width: 10px;
+  border-radius: 10px;
+  margin: 2px;
+  bottom: 5px;
+  animation: bounceAnim 0.5s cubic-bezier(0.3, 0, 0, 1) infinite;
+  animation-direction: alternate;
+}
+
+.circle1 {
+  left: 30%;
+  animation-delay: 0s;
+  background-color: #22d3ee;
+  box-shadow: 0 0 10px #22d3ee;
+}
+
+.circle2 {
+  left: 45%;
+  animation-delay: 0.2s;
+  background-color: #3d9bff;
+  box-shadow: 0 0 10px #3d9bff;
+}
+
+.circle3 {
+  left: 60%;
+  animation-delay: 0.4s;
+  background-color: #78c0ff;
+  box-shadow: 0 0 10px #78c0ff;
+}

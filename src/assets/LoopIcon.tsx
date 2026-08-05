@@ -1,6 +1,8 @@
-import React from 'react';
+'use client';
 
-export const LoopIcon = (props: React.SVGProps<SVGSVGElement>) => (
+import { SVGProps } from 'react';
+
+export const LoopIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg
     version="1.1"
     id="Capa_1"

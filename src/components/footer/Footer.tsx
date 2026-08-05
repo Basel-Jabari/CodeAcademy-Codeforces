@@ -1,65 +1,28 @@
-import React, {ReactElement} from 'react';
-import styled from 'styled-components';
-import {images} from '../../assets';
-import Row from '../common/Row';
-import theme from '../../theme';
+'use client';
 
-const StyledFooter = styled.div`
-  width: 100%;
-  background-color: ${theme.surface};
-  border-top: 1px solid ${theme.border};
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 2px;
-  padding: 6px 0;
-  color: ${theme.textMuted};
-  font-size: 14px;
-`;
+import Image from 'next/image';
+import Link from 'next/link';
 
-const GithubLogo = styled.img`
-  width: 20px;
-  margin: 6px 10px;
-  opacity: 0.7;
-`;
+import { images } from '@/assets';
 
-const Link = styled(Row)`
-  cursor: pointer;
-  width: auto;
-  transition: 0.3s;
+import styles from './Footer.module.css';
 
-  &:hover {
-    color: ${theme.accentBright};
+const originalRepositoryUrl = 'https://github.com/KarimElghamry/Codeforces-Randomizer';
+const projectRepositoryUrl = 'https://github.com/Basel-Jabari/Codeforces-Randomizer';
 
-    img {
-      opacity: 1;
-    }
-  }
-`;
-
-const originalRepositoryUrl: string =
-  'https://github.com/KarimElghamry/Codeforces-Randomizer';
-
-const projectRepositoryUrl: string =
-  'https://github.com/Basel-Jabari/Codeforces-Randomizer';
-
-const Footer: React.FC = (): ReactElement => {
+export default function Footer() {
   return (
-    <StyledFooter>
-      <Link onClick={() => window.open(originalRepositoryUrl, '_blank')}>
-        <GithubLogo src={images.githubLogo} alt=""></GithubLogo>
+    <footer className={styles.footer}>
+      <Link className={styles.link} href={originalRepositoryUrl} target="_blank" rel="noopener noreferrer">
+        <Image className={styles.githubLogo} src={images.githubLogo} alt="GitHub Logo" width={20} height={20} />
         <div>Codeforces Randomizer — Karim Elghamry</div>
       </Link>
-      <Link onClick={() => window.open(projectRepositoryUrl, '_blank')}>
-        <GithubLogo src={images.githubLogo} alt=""></GithubLogo>
+      <Link className={styles.link} href={projectRepositoryUrl} target="_blank" rel="noopener noreferrer">
+        <Image className={styles.githubLogo} src={images.githubLogo} alt="GitHub Logo" width={20} height={20} />
         <div>
-          CodeAcademy-Codeforces — Basel Al-Jabari, Bara Wazwaz, Mohammed
-          Al-Shareef
+          CodeAcademy-Codeforces — Basel Al-Jabari, Bara Wazwaz, Mohammed Al-Shareef
         </div>
       </Link>
-    </StyledFooter>
+    </footer>
   );
-};
-
-export default Footer;
+}

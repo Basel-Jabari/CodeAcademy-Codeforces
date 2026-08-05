@@ -1,10 +1,9 @@
-import React, {ReactElement} from 'react';
-import Home from './components/home/Home';
-import {getPromblemsListFromStorage} from './services/storage';
+'use client';
 
-const App: React.FC<{}> = (): ReactElement => {
+import Home from '@/components/home/Home';
+import { getPromblemsListFromStorage } from '@/utils/storage';
+
+export default function App() {
   const problemsList = getPromblemsListFromStorage();
-  return <Home initialProblemsList={problemsList}></Home>;
-};
-
-export default App;
+  return <Home initialProblemsList={problemsList} />;
+}

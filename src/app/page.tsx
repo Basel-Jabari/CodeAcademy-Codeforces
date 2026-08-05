@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-import ClientPage from './client-page';
-import Loading from './loading';
+import ClientPage from '@/app/client-page';
+import Loading from '@/app/loading';
 
 export default function Page() {
   return (
@@ -9,4 +9,3 @@ export default function Page() {
     </Suspense>
   );
 }
-

@@ -1,10 +1,10 @@
 import React from 'react';
-import StyledComponentsRegistry from './registry';
-import '../index.css';
+import StyledComponentsRegistry from '@/app/registry';
+import '@/index.css';
 
 export const metadata = {
   title: 'Codeforces X PPU Code Academy',
-  description: 'Browser tools for PPU Code Academy, built on the public Codeforces API.',
+  description: 'Browser tools for PPU Code Academy built on the public Codeforces API.',
 };
 
 export default function RootLayout({
@@ -15,9 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <StyledComponentsRegistry>
-          {children}
-        </StyledComponentsRegistry>
+        <StyledComponentsRegistry>{children}</StyledComponentsRegistry>
       </body>
     </html>
   );

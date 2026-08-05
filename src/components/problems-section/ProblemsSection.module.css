@@ -1,0 +1,29 @@
+.row {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.problemsSection {
+  margin-top: 14px;
+  height: 300px;
+  width: 100%;
+  overflow-y: auto;
+  scrollbar-color: #2c4470 transparent;
+  scrollbar-width: thin;
+}
+
+.problemsSection::-webkit-scrollbar {
+  width: 8px;
+}
+
+.problemsSection::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.problemsSection::-webkit-scrollbar-thumb {
+  background-color: #2c4470;
+  border-radius: 5px;
+}

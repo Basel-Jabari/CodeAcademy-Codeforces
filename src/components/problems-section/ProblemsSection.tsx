@@ -1,70 +1,40 @@
-import React, {ReactElement, useEffect} from 'react';
-import ProblemCard from './ProblemCard';
-import {ProblemStatistics} from '../../models/ProblemStatistics';
-import {Problem} from '../../models/Problem';
-import styled from 'styled-components';
-import EmptySection from './EmptySection';
-import Row from '../common/Row';
-import theme from '../../theme';
+'use client';
+
+import { useEffect, useRef } from 'react';
+
+import EmptySection from '@/components/problems-section/EmptySection';
+import ProblemCard from '@/components/problems-section/ProblemCard';
+import { Problem } from '@/types/Problem';
+import { ProblemStatistics } from '@/types/ProblemStatistics';
+
+import styles from './ProblemsSection.module.css';
 
 interface Props {
-  problemsList: Array<{problem: Problem; problemStatistics: ProblemStatistics}>;
+  problemsList: Array<{ problem: Problem; problemStatistics: ProblemStatistics }>;
 }
 
-const StyleProblemsSection = styled.div`
-  margin-top: 14px;
-  height: 300px;
-  width: 100%;
-  overflow-y: auto;
-  scrollbar-color: ${theme.borderBright} transparent;
-  scrollbar-width: thin;
-
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: ${theme.borderBright};
-    border-radius: 5px;
-  }
-
-`;
-
-const ProblemsSection: React.FC<Props> = (props: Props): ReactElement => {
-  const problemsList = props.problemsList;
-  let wrapperRef: HTMLDivElement | null = null;
+export default function ProblemsSection({ problemsList }: Props) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!wrapperRef) return;
-
-    wrapperRef.scrollTo(0, 0);
-  }, [problemsList, wrapperRef]);
+    wrapperRef.current?.scrollTo(0, 0);
+  }, [problemsList]);
 
   return (
-    <Row>
-      <StyleProblemsSection ref={(ref) => { wrapperRef = ref; }}>
+    <div className={styles.row}>
+      <div className={styles.problemsSection} ref={wrapperRef}>
         {problemsList.length === 0 ? (
-          <EmptySection></EmptySection>
+          <EmptySection />
         ) : (
-          problemsList
-            .map((val, index) => {
-              return (
-                <ProblemCard
-                  key={index}
-                  problem={val.problem}
-                  problemStatistics={val.problemStatistics}
-                ></ProblemCard>
-              );
-            })
-            .reverse()
+          [...problemsList].reverse().map((val, index) => (
+            <ProblemCard
+              key={index}
+              problem={val.problem}
+              problemStatistics={val.problemStatistics}
+            />
+          ))
         )}
-      </StyleProblemsSection>
-    </Row>
+      </div>
+    </div>
   );
-};
-
-export default ProblemsSection;
+}

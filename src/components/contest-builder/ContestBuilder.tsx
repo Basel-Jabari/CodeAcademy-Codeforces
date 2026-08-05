@@ -1,30 +1,24 @@
-import React, { ReactElement, useState } from "react";
-import styled from "styled-components";
-import { Problem } from "../../models/Problem";
-import { ProblemStatistics } from "../../models/ProblemStatistics";
-import { TagNode } from "../../models/TagExpression";
-import ExpressionBuilder from "../expression/ExpressionBuilder";
-import Slider from "../slider/Slider";
-import OutlineButton from "../common/OutlineButton";
-import { minRating, maxRating } from "../../services/data";
-import { getRandomProblem, getRandomProblems } from "../../services/problems";
-import { parseHandles, getProblemKey } from "../../services/submissions";
-import { getProblemUrl } from "../../services/problemLink";
-import { moveItem } from "../../services/tableSort";
-import {
-  createDefaultExpression,
-  regenerateNodeIds,
-} from "../../services/tagExpression";
-import {
-  formatHandleList,
-  parseHandleList,
-  readFileAsText,
-} from "../../services/handleList";
-import { downloadJson } from "../../services/jsonFile";
-import { downloadExcelSheets } from "../../services/excelExport";
-import ProblemLinkText from "../common/ProblemLinkText";
-import theme from "../../theme";
-import { usePersistentState } from "../../services/persistentState";
+'use client';
+
+import React, { useState } from 'react';
+
+import OutlineButton from '@/components/common/OutlineButton';
+import ProblemLinkText from '@/components/common/ProblemLinkText';
+import ExpressionBuilder from '@/components/expression/ExpressionBuilder';
+import Slider from '@/components/slider/Slider';
+import { getRandomProblem, getRandomProblems } from '@/services/problems';
+import { getProblemKey, parseHandles } from '@/services/submissions';
+import { Problem } from '@/types/Problem';
+import { ProblemStatistics } from '@/types/ProblemStatistics';
+import { TagNode } from '@/types/TagExpression';
+import { maxRating, minRating } from '@/utils/data';
+import { downloadExcelSheets } from '@/utils/excelExport';
+import { formatHandleList, parseHandleList, readFileAsText } from '@/utils/handleList';
+import { downloadJson } from '@/utils/jsonFile';
+import { usePersistentState } from '@/utils/persistentState';
+import { getProblemUrl } from '@/utils/problemLink';
+import { moveItem } from '@/utils/tableSort';
+import { createDefaultExpression, regenerateNodeIds } from '@/utils/tagExpression';
 
 interface Props {
   onError: (message: string) => void;
@@ -776,10 +770,10 @@ const ContestBuilder: React.FC<Props> = (props: Props): ReactElement => {
         rows.map((row: BuiltRow) =>
           row.rowId === rowId
             ? {
-                ...row,
-                problem: picked.problem,
-                problemStatistics: picked.problemStatistics,
-              }
+              ...row,
+              problem: picked.problem,
+              problemStatistics: picked.problemStatistics,
+            }
             : row,
         ),
       );
@@ -890,12 +884,12 @@ const ContestBuilder: React.FC<Props> = (props: Props): ReactElement => {
     sortColumn === null
       ? rows
       : rows
-          .slice()
-          .sort((a: BuiltRow, b: BuiltRow) =>
-            sortDirection === "asc"
-              ? compareRows(a, b, sortColumn)
-              : compareRows(b, a, sortColumn),
-          );
+        .slice()
+        .sort((a: BuiltRow, b: BuiltRow) =>
+          sortDirection === "asc"
+            ? compareRows(a, b, sortColumn)
+            : compareRows(b, a, sortColumn),
+        );
 
   const renderCell = (
     row: BuiltRow,

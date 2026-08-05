@@ -4,7 +4,7 @@ import {
   isRootMode,
   RootMode,
   TagNode,
-} from "../models/TagExpression";
+} from "@/types/TagExpression";
 
 let nextNodeId: number = 1;
 

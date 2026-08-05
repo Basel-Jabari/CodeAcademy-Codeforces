@@ -1,0 +1,27 @@
+.outlineButton {
+  padding: 7px 14px;
+  color: #8595b4;
+  background-color: transparent;
+  border: 1px solid #1e2c4a;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.outlineButton:hover:enabled {
+  color: #78c0ff;
+  border-color: #3d9bff;
+  box-shadow: 0 0 14px rgba(61, 155, 255, 0.18);
+}
+
+.outlineButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.outlineButton:focus {
+  outline: none;
+}
