@@ -56,7 +56,7 @@ const GroupCard = styled.div<{ $accent: string; $active: boolean }>`
   border-left: 3px solid ${(props) => props.$accent};
   border-radius: 10px;
   background-color: ${(props) =>
-    props.$active ? "rgba(61, 155, 255, 0.09)" : "rgba(7, 11, 20, 0.45)"};
+    props.$active ? theme.glowSoft : theme.background};
   box-shadow: ${(props) =>
     props.$active ? `0 0 16px ${theme.glowSoft}` : "none"};
   transition: border-color 0.2s, background-color 0.2s;
@@ -90,7 +90,7 @@ const ModeSwitch = styled.div`
   display: flex;
   gap: 3px;
   padding: 2px;
-  background-color: rgba(7, 11, 20, 0.7);
+  background-color: ${theme.background};
   border: 1px solid ${theme.border};
   border-radius: 7px;
 `;
@@ -212,7 +212,7 @@ const LeafRemove = styled.span`
   font-size: 12px;
   line-height: 1;
   color: ${theme.accentBright};
-  background-color: rgba(7, 11, 20, 0.5);
+  background-color: ${theme.background};
   cursor: pointer;
 
   &:hover {

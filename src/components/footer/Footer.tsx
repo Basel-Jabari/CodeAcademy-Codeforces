@@ -5,6 +5,9 @@ import Row from '../common/Row';
 import theme from '../../theme';
 
 const StyledFooter = styled.div`
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
   width: 100%;
   background-color: ${theme.surface};
   border-top: 1px solid ${theme.border};
@@ -13,6 +16,8 @@ const StyledFooter = styled.div`
   justify-content: center;
   align-items: center;
   gap: 2px;
+  box-shadow: 0 -18px 55px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(12px);
   padding: 6px 0;
   color: ${theme.textMuted};
   font-size: 14px;

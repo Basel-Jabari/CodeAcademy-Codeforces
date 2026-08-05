@@ -1,13 +1,15 @@
 import React, { ReactElement, useState } from "react";
 import styled from "styled-components";
-import Header from "../header/Header";
+import BrandHeader from "../header/BrandHeader";
 import Snackbar from "../snackbar/Snackbar";
 import Footer from "../footer/Footer";
-import TabBar, { AppTab } from "../tabs/TabBar";
+import ServiceNavigation, { AppTab } from "../navigation/ServiceNavigation";
 import RandomizerTab from "../randomizer/RandomizerTab";
 import ProblemCheck from "../problem-check/ProblemCheck";
 import ContestBuilder from "../contest-builder/ContestBuilder";
 import { Problem } from "../../models/Problem";
+import { MangaAtmosphere, ChapterBanner } from "../effects/MangaAtmosphere";
+import { themeVariables } from "../../themePalettes";
 import { ProblemStatistics } from "../../models/ProblemStatistics";
 
 interface Props {
@@ -24,10 +26,18 @@ const Page = styled.div`
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--cf-text);
+  background-color: var(--cf-bg);
+  transition: color 0.45s ease, background-color 0.45s ease;
 `;
 
 const Content = styled.div`
   flex: 1;
+  position: relative;
+  z-index: 2;
   box-sizing: border-box;
   width: 100%;
   max-width: 1920px;
@@ -58,9 +68,11 @@ const Home: React.FC<Props> = (props: Props): ReactElement => {
   };
 
   return (
-    <Page>
-      <Header></Header>
-      <TabBar active={tab} onChange={setTab}></TabBar>
+    <Page style={themeVariables(tab) as React.CSSProperties} data-theme={tab}>
+      <MangaAtmosphere kind={tab}></MangaAtmosphere>
+      <BrandHeader></BrandHeader>
+      <ServiceNavigation active={tab} onChange={setTab}></ServiceNavigation>
+      <ChapterBanner kind={tab}></ChapterBanner>
 
       <Content>
         {tab === "randomizer" ? (

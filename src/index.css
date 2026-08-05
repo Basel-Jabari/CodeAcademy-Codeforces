@@ -8,8 +8,8 @@ body {
   height: 100%;
   margin: 0px;
   padding: 0px;
-  color: #e8eefc;
-  background-color: #070b14;
+  color: #f1eef5;
+  background-color: #050407;
   font-family: Kanit;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -19,21 +19,41 @@ body {
 body {
   display: flex;
   flex-direction: column;
-  /* two dim blue light sources bleeding in from the top corners */
-  background-image: radial-gradient(
-      900px circle at 15% -10%,
-      rgba(61, 155, 255, 0.16),
-      transparent 60%
-    ),
-    radial-gradient(
-      700px circle at 85% 0%,
-      rgba(34, 211, 238, 0.1),
-      transparent 60%
-    );
+  background-image: linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 48px 48px;
   background-attachment: fixed;
   background-repeat: no-repeat;
 }
 
 ::selection {
-  background-color: rgba(61, 155, 255, 0.35);
+  color: #fff;
+  background-color: rgba(146, 92, 255, 0.45);
+}
+
+button,
+input,
+select,
+textarea {
+  accent-color: var(--cf-accent, #925cff);
+}
+
+* {
+  scrollbar-color: var(--cf-border-bright, #52377b) var(--cf-bg, #050407);
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--cf-bg, #050407);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--cf-border-bright, #52377b);
+  border: 2px solid var(--cf-bg, #050407);
+  border-radius: 999px;
 }
