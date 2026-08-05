@@ -46,7 +46,7 @@ const ProblemsSection: React.FC<Props> = (props: Props): ReactElement => {
 
   return (
     <Row>
-      <StyleProblemsSection ref={(ref) => (wrapperRef = ref)}>
+      <StyleProblemsSection ref={(ref) => { wrapperRef = ref; }}>
         {problemsList.length === 0 ? (
           <EmptySection></EmptySection>
         ) : (

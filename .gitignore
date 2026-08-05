@@ -6,8 +6,9 @@
 # testing
 /coverage
 
-# production
-/build
+# production (Next.js)
+/.next
+/out
 
 # environment
 .env

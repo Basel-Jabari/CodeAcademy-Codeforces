@@ -70,15 +70,14 @@ async function getSubmissionsPage(
   let comment: string | undefined;
 
   try {
-    const response = await axios.get(statusUrl, {
-      params: { handle: handle, from: from, count: pageSize },
-    });
+    const url = `${statusUrl}?handle=${encodeURIComponent(handle)}&from=${from}&count=${pageSize}`;
+    const response = await fetch(url);
+    const data = await response.json();
 
-    if (response.data.status === "OK") return response.data.result as Submission[];
-    comment = response.data.comment;
+    if (data.status === "OK") return data.result as Submission[];
+    comment = data.comment;
   } catch (e) {
-    // codeforces answers an unknown handle with 400 and an explanatory comment
-    comment = e.response && e.response.data && e.response.data.comment;
+    // fetch or json parsing failure
   }
 
   const error: CodeforcesError = new Error(
@@ -94,6 +93,27 @@ async function getHandleHistory(handle: string): Promise<HandleHistory> {
   const cacheKey: string = handle.toLowerCase();
   const cached: HandleHistory | undefined = historyCache.get(cacheKey);
   if (cached) return cached;
+
+  if (typeof window !== "undefined") {
+    try {
+      const storageKey = `cf_submissions_${cacheKey}`;
+      const cachedStr = localStorage.getItem(storageKey);
+      if (cachedStr) {
+        const stored = JSON.parse(cachedStr);
+        // Cache for 5 minutes
+        if (Date.now() - stored.timestamp < 5 * 60 * 1000) {
+          const history: HandleHistory = {
+            accepted: new Set(stored.data.accepted),
+            attempted: new Set(stored.data.attempted),
+          };
+          historyCache.set(cacheKey, history);
+          return history;
+        }
+      }
+    } catch {
+      // ignore localStorage errors
+    }
+  }
 
   const history: HandleHistory = { accepted: new Set(), attempted: new Set() };
   let from: number = 1;
@@ -115,6 +135,23 @@ async function getHandleHistory(handle: string): Promise<HandleHistory> {
   }
 
   historyCache.set(cacheKey, history);
+
+  if (typeof window !== "undefined") {
+    try {
+      const storageKey = `cf_submissions_${cacheKey}`;
+      const cacheObj = {
+        timestamp: Date.now(),
+        data: {
+          accepted: Array.from(history.accepted),
+          attempted: Array.from(history.attempted),
+        },
+      };
+      localStorage.setItem(storageKey, JSON.stringify(cacheObj));
+    } catch {
+      // ignore localStorage write errors
+    }
+  }
+
   return history;
 }
 

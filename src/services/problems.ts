@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Problem } from "../models/Problem";
 import { ProblemStatistics } from "../models/ProblemStatistics";
 import { TagNode } from "../models/TagExpression";
@@ -28,6 +27,11 @@ export interface PickedProblem {
   problemStatistics: ProblemStatistics;
 }
 
+interface CachedProblemset {
+  timestamp: number;
+  data: Problemset;
+}
+
 // the tag tree can ask anything, so the API tag query cannot help;
 // the whole problemset is fetched once and reused for the rest of the session
 let problemsetCache: Problemset | null = null;
@@ -39,16 +43,49 @@ function getRandomInt(max: number): number {
 export async function getProblemset(): Promise<Problemset> {
   if (problemsetCache !== null) return problemsetCache;
 
-  await waitForCodeforcesApiSlot();
-  const response = await axios.get(baseUrl);
+  // Check client-side localStorage
+  if (typeof window !== "undefined") {
+    try {
+      const cachedStr = localStorage.getItem("cf_problemset_cache");
+      if (cachedStr) {
+        const cached: CachedProblemset = JSON.parse(cachedStr);
+        // Cache for 12 hours (12 * 60 * 60 * 1000 ms)
+        if (Date.now() - cached.timestamp < 12 * 3600 * 1000) {
+          problemsetCache = cached.data;
+          return problemsetCache;
+        }
+      }
+    } catch {
+      // ignore parsing or storage block errors
+    }
+  }
 
-  if (response.data.status !== "OK")
+  await waitForCodeforcesApiSlot();
+  const response = await fetch(baseUrl);
+  if (!response.ok) {
+    throw new Error("Could not load the Codeforces problemset. Try again.");
+  }
+  const data = await response.json();
+
+  if (data.status !== "OK")
     throw new Error("Could not load the Codeforces problemset. Try again.");
 
   const problemset: Problemset = {
-    problems: response.data.result.problems as Problem[],
-    statistics: response.data.result.problemStatistics as ProblemStatistics[],
+    problems: data.result.problems as Problem[],
+    statistics: data.result.problemStatistics as ProblemStatistics[],
   };
+
+  if (typeof window !== "undefined") {
+    try {
+      const cacheObj: CachedProblemset = {
+        timestamp: Date.now(),
+        data: problemset,
+      };
+      localStorage.setItem("cf_problemset_cache", JSON.stringify(cacheObj));
+    } catch {
+      // ignore write issues (e.g., private window quota limit)
+    }
+  }
 
   problemsetCache = problemset;
   return problemset;

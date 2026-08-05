@@ -1,4 +1,3 @@
-import axios from "axios";
 import { getProblemUrl, ProblemReference } from "./problemLink";
 import { waitForCodeforcesApiSlot } from "./submissions";
 
@@ -102,19 +101,53 @@ async function cfGet(
   method: string,
   params: { [key: string]: string | number | boolean },
 ): Promise<any> {
+  const isStandings = method === "contest.standings";
+  const contestId = params.contestId;
+  const storageKey = `cf_standings_${contestId}`;
+
+  if (isStandings && typeof window !== "undefined") {
+    try {
+      const cachedStr = localStorage.getItem(storageKey);
+      if (cachedStr) {
+        const stored = JSON.parse(cachedStr);
+        // Cache for 1 hour (3600 * 1000 ms)
+        if (Date.now() - stored.timestamp < 3600 * 1000) {
+          return stored.data;
+        }
+      }
+    } catch {
+      // ignore localStorage errors
+    }
+  }
+
   await waitForCodeforcesApiSlot();
 
   try {
-    const response = await axios.get(`https://codeforces.com/api/${method}`, {
-      params: params,
-    });
-    if (response.data.status === "OK") return response.data.result;
-    const comment: string = response.data.comment || "Unknown API error";
-    throw new Error(comment);
-  } catch (e) {
-    if (e.response && e.response.data && e.response.data.comment) {
-      throw new Error(e.response.data.comment);
+    const searchParams = new URLSearchParams();
+    for (const [k, v] of Object.entries(params)) {
+      searchParams.append(k, String(v));
     }
+    const url = `https://codeforces.com/api/${method}?${searchParams.toString()}`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.status === "OK") {
+      if (isStandings && typeof window !== "undefined") {
+        try {
+          const cacheObj = {
+            timestamp: Date.now(),
+            data: data.result,
+          };
+          localStorage.setItem(storageKey, JSON.stringify(cacheObj));
+        } catch {
+          // ignore localStorage write errors
+        }
+      }
+      return data.result;
+    }
+    const comment: string = data.comment || "Unknown API error";
+    throw new Error(comment);
+  } catch (e: any) {
     if (e.message) throw e;
     throw new Error(
       "Codeforces request failed. Check the contest link and connection.",
@@ -181,7 +214,7 @@ export async function importContestFromLink(
         } (problems only).`,
       ],
     };
-  } catch (e) {
+  } catch (e: any) {
     throw new Error(
       `Could not import this contest: ${e.message}. Only public contests/gyms are supported (no private or group contests).`,
     );

@@ -4,35 +4,24 @@
   "homepage": ".",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
-    "@types/axios": "^0.14.0",
-    "@types/jest": "^24.9.1",
-    "@types/node": "^12.12.47",
-    "@types/react": "^16.9.36",
-    "@types/react-dom": "^16.9.8",
-    "@types/styled-components": "^5.1.0",
-    "axios": "^0.19.2",
+    "axios": "^1.7.2",
     "baseline-browser-mapping": "^2.11.8",
     "caniuse-lite": "^1.0.30001806",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-range": "^1.6.7",
-    "react-scripts": "3.4.1",
-    "styled-components": "^5.1.1",
-    "typescript": "^3.7.5"
+    "next": "^14.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-range": "^1.8.15",
+    "styled-components": "^6.1.11"
   },
   "scripts": {
-    "start": "react-scripts --openssl-legacy-provider start",
-    "build": "react-scripts --openssl-legacy-provider build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "dev": "tsx server.ts",
+    "start": "tsx server.ts",
+    "build": "next build",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d out"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "next/core-web-vitals"
   },
   "browserslist": {
     "production": [
@@ -47,9 +36,13 @@
     ]
   },
   "devDependencies": {
-    "@types/babel__traverse": "^7.11.0",
-    "@types/react-rangeslider": "^2.2.2",
-    "gh-pages": "^3.0.0"
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.14.9",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "gh-pages": "^3.0.0",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3"
   },
   "description": "Browser tools for [**PPU Code Academy**](<https://linktr.ee/PPUCodeAcademy12>), built on the public Codeforces API.",
   "main": "index.js",
