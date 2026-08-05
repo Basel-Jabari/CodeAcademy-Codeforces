@@ -33,6 +33,7 @@ import {
 import OutlineButton from "../common/OutlineButton";
 import ProblemLinkText from "../common/ProblemLinkText";
 import theme from "../../theme";
+import { usePersistentState } from "../../services/persistentState";
 
 interface Props {
   onError: (message: string) => void;
@@ -686,34 +687,66 @@ const LoadingNote = styled.div`
 `;
 
 const ProblemCheck: React.FC<Props> = (props: Props): ReactElement => {
-  const [handlesInput, setHandlesInput] = useState<string>("");
-  const [problemsInput, setProblemsInput] = useState<string>("");
-  const [handles, setHandles] = useState<string[]>([]);
-  const [problems, setProblems] = useState<ProblemColumn[]>([]);
-  const [groups, setGroups] = useState<ProblemGroup[]>([]);
-  const manualGroupSeq = useRef<number>(1);
-  const [hiddenHandles, setHiddenHandles] = useState<Flags>({});
-  const [hiddenProblems, setHiddenProblems] = useState<Flags>({});
-  const [matrix, setMatrix] = useState<{
+  const [handlesInput, setHandlesInput] = usePersistentState<string>(
+    "crossAnalysis.handlesInput",
+    "",
+  );
+  const [problemsInput, setProblemsInput] = usePersistentState<string>(
+    "crossAnalysis.problemsInput",
+    "",
+  );
+  const [handles, setHandles] = usePersistentState<string[]>(
+    "crossAnalysis.handles",
+    [],
+  );
+  const [problems, setProblems] = usePersistentState<ProblemColumn[]>(
+    "crossAnalysis.problems",
+    [],
+  );
+  const [groups, setGroups] = usePersistentState<ProblemGroup[]>(
+    "crossAnalysis.groups",
+    [],
+  );
+  const manualGroupSeq = useRef<number>(
+    groups.reduce((largest: number, group: ProblemGroup) => {
+      const match: RegExpExecArray | null = /^manual-(\d+)$/.exec(group.id);
+      return match ? Math.max(largest, Number(match[1])) : largest;
+    }, 0) + 1,
+  );
+  const [hiddenHandles, setHiddenHandles] = usePersistentState<Flags>(
+    "crossAnalysis.hiddenHandles",
+    {},
+  );
+  const [hiddenProblems, setHiddenProblems] = usePersistentState<Flags>(
+    "crossAnalysis.hiddenProblems",
+    {},
+  );
+  const [matrix, setMatrix] = usePersistentState<{
     [problemKey: string]: { [handleKey: string]: ProblemStatus };
-  }>({});
+  }>("crossAnalysis.matrix", {});
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const [loadingNote, setLoadingNote] = useState<string>("");
 
-  const [contestLink, setContestLink] = useState<string>("");
+  const [contestLink, setContestLink] = usePersistentState<string>(
+    "crossAnalysis.contestLink",
+    "",
+  );
   const [isImportingContest, setIsImportingContest] = useState<boolean>(false);
-  const [contestNotes, setContestNotes] = useState<string>("");
+  const [contestNotes, setContestNotes] = usePersistentState<string>(
+    "crossAnalysis.contestNotes",
+    "",
+  );
 
   // each table keeps its own order, so dragging one never moves another
-  const [handleOrders, setHandleOrders] = useState<{ [id: string]: string[] }>(
-    {},
-  );
-  const [problemOrders, setProblemOrders] = useState<{
+  const [handleOrders, setHandleOrders] = usePersistentState<{
     [id: string]: string[];
-  }>({});
-  const [statusOrders, setStatusOrders] = useState<{
+  }>("crossAnalysis.handleOrders", {});
+  const [problemOrders, setProblemOrders] = usePersistentState<{
+    [id: string]: string[];
+  }>("crossAnalysis.problemOrders", {});
+  const [statusOrders, setStatusOrders] = usePersistentState<{
     [id: string]: ProblemStatus[];
-  }>({});
+  }>("crossAnalysis.statusOrders", {});
 
   const [drag, setDrag] = useState<DragState | null>(null);
   const [openFilter, setOpenFilter] = useState<"handles" | "problems" | null>(

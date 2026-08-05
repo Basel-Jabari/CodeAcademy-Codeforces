@@ -9,6 +9,7 @@ import ProblemCheck from "../problem-check/ProblemCheck";
 import ContestBuilder from "../contest-builder/ContestBuilder";
 import { Problem } from "../../models/Problem";
 import { ProblemStatistics } from "../../models/ProblemStatistics";
+import { usePersistentState } from "../../services/persistentState";
 
 interface Props {
   initialProblemsList: Array<{
@@ -39,8 +40,26 @@ const Content = styled.div`
   }
 `;
 
+const TabPane = styled.div<{ $active: boolean }>`
+  display: ${(props) => (props.$active ? "block" : "none")};
+`;
+
+const appTabs: AppTab[] = [
+  "randomizer",
+  "crossAnalysis",
+  "contestBuilder",
+];
+
+function restoreAppTab(value: AppTab): AppTab {
+  return appTabs.indexOf(value) === -1 ? "randomizer" : value;
+}
+
 const Home: React.FC<Props> = (props: Props): ReactElement => {
-  const [tab, setTab] = useState<AppTab>("randomizer");
+  const [tab, setTab] = usePersistentState<AppTab>(
+    "activeTab",
+    "randomizer",
+    restoreAppTab,
+  );
   const [snackContent, setSnackContent] = useState<string>("");
   const [snackType, setSnackType] = useState<NotifyType>("error");
   const [visible, setVisible] = useState<boolean>(false);
@@ -63,23 +82,32 @@ const Home: React.FC<Props> = (props: Props): ReactElement => {
       <TabBar active={tab} onChange={setTab}></TabBar>
 
       <Content>
-        {tab === "randomizer" ? (
+        <TabPane
+          $active={tab === "randomizer"}
+          aria-hidden={tab !== "randomizer"}
+        >
           <RandomizerTab
             initialProblemsList={props.initialProblemsList}
             onError={triggerError}
           ></RandomizerTab>
-        ) : null}
+        </TabPane>
 
-        {tab === "crossAnalysis" ? (
+        <TabPane
+          $active={tab === "crossAnalysis"}
+          aria-hidden={tab !== "crossAnalysis"}
+        >
           <ProblemCheck
             onError={triggerError}
             onSuccess={triggerSuccess}
           ></ProblemCheck>
-        ) : null}
+        </TabPane>
 
-        {tab === "contestBuilder" ? (
+        <TabPane
+          $active={tab === "contestBuilder"}
+          aria-hidden={tab !== "contestBuilder"}
+        >
           <ContestBuilder onError={triggerError}></ContestBuilder>
-        ) : null}
+        </TabPane>
       </Content>
 
       <Footer></Footer>
