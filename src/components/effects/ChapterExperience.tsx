@@ -11,8 +11,18 @@ interface StageProps extends ChapterProps {
 }
 
 const eyePulse = keyframes`
-  0%, 100% { opacity: .78; filter: drop-shadow(0 0 8px var(--cf-glow)); }
-  50% { opacity: 1; filter: drop-shadow(0 0 18px var(--cf-glow)); }
+  0%, 100% { opacity: .82; filter: drop-shadow(0 0 10px var(--cf-glow)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 22px var(--cf-glow)); }
+`;
+
+const irisSpin = keyframes`
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+`;
+
+const rinneganPulse = keyframes`
+  0%, 100% { opacity: .55; }
+  50% { opacity: 1; }
 `;
 
 const rise = keyframes`
@@ -74,90 +84,452 @@ const EyeSvg = styled.svg`
   height: auto;
   overflow: visible;
   color: var(--cf-accent-bright);
-  animation: ${eyePulse} 4.8s ease-in-out infinite;
+  animation: ${eyePulse} 5.2s ease-in-out infinite;
 
   .soft {
-    opacity: .42;
+    opacity: 0.38;
   }
 
   .hot {
     color: var(--cf-secondary);
   }
 
+  .spin {
+    animation: ${irisSpin} 14s linear infinite;
+  }
+
+  .spin-slow {
+    animation: ${irisSpin} 28s linear infinite;
+  }
+
+  .breathe {
+    animation: ${rinneganPulse} 3.6s ease-in-out infinite;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     animation: none;
+    .spin,
+    .spin-slow,
+    .breathe {
+      animation: none;
+    }
   }
 `;
 
-const Stroke: React.FC<{
-  d: string;
+/** Shared almond eye outline — classic manga eye silhouette */
+const EyeLid: React.FC<{
+  cx: number;
+  cy: number;
+  w?: number;
+  h?: number;
   width?: number;
-  className?: string;
-}> = ({ d, width = 2, className }): ReactElement => (
-  <path
-    d={d}
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={width}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />
+}> = ({ cx, cy, w = 96, h = 52, width = 2.8 }): ReactElement => {
+  const left = cx - w;
+  const right = cx + w;
+  const top = cy - h;
+  const bottom = cy + h * 0.72;
+  return (
+    <g>
+      <path
+        d={`M${left} ${cy} C${cx - w * 0.55} ${top} ${cx + w * 0.35} ${top} ${right} ${cy}
+            C${cx + w * 0.4} ${bottom} ${cx - w * 0.55} ${bottom} ${left} ${cy}Z`}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={width}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* lower lid crease */}
+      <path
+        className="soft"
+        d={`M${left + 10} ${cy + 2} C${cx - w * 0.2} ${bottom - 6} ${cx + w * 0.25} ${bottom - 8} ${right - 8} ${cy + 1}`}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.2}
+        strokeLinecap="round"
+      />
+      {/* sharp outer corner flick */}
+      <path
+        d={`M${right - 4} ${cy - 2} L${right + 14} ${cy - 10}`}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={width * 0.85}
+        strokeLinecap="round"
+      />
+    </g>
+  );
+};
+
+const spinOrigin = (cx: number, cy: number): React.CSSProperties => ({
+  transformOrigin: `${cx}px ${cy}px`,
+  transformBox: "view-box",
+});
+
+/** Classic 3-tomoe Sharingan (Uchiha / Madara) */
+const SharinganIris: React.FC<{ cx: number; cy: number; r?: number }> = ({
+  cx,
+  cy,
+  r = 36,
+}): ReactElement => {
+  const pupil = r * 0.2;
+  // Magatama / comma tomoe centered on local origin, then rotated into place
+  const tomoePath =
+    "M0 -18 C8 -18 14 -10 12 -2 C10 8 4 14 0 18 C-2 10 -2 2 0 -2 C-6 -6 -8 -14 0 -18Z";
+
+  return (
+    <g>
+      <circle
+        cx={cx}
+        cy={cy}
+        r={r}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2.6}
+      />
+      <circle
+        cx={cx}
+        cy={cy}
+        r={r * 0.82}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.15}
+        className="soft"
+      />
+      <g className="spin" style={spinOrigin(cx, cy)}>
+        {[0, 120, 240].map((angle: number) => (
+          <g key={angle} transform={`translate(${cx} ${cy}) rotate(${angle}) translate(0 ${-r * 0.48})`}>
+            <path
+              d={tomoePath}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.8}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            {/* tomoe head accent */}
+            <circle
+              cx={2}
+              cy={-12}
+              r={3.2}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.8}
+            />
+          </g>
+        ))}
+      </g>
+      <circle
+        cx={cx}
+        cy={cy}
+        r={pupil}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2.6}
+      />
+      <circle cx={cx} cy={cy} r={pupil * 0.4} fill="currentColor" />
+    </g>
+  );
+};
+
+/** Shanks — calm eye crossed by the three-line scar */
+const ShanksEye: React.FC<{ cx: number; cy: number }> = ({
+  cx,
+  cy,
+}): ReactElement => (
+  <g>
+    <EyeLid cx={cx} cy={cy} w={94} h={48} width={3} />
+    <circle
+      cx={cx}
+      cy={cy}
+      r={28}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.2}
+    />
+    <circle
+      cx={cx}
+      cy={cy}
+      r={14}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      className="hot"
+    />
+    <circle cx={cx} cy={cy} r={5} fill="currentColor" />
+    {/* iconic three parallel scar strokes */}
+    <g stroke="currentColor" strokeLinecap="round" className="hot">
+      <line x1={cx - 52} y1={cy - 48} x2={cx + 38} y2={cy + 42} strokeWidth={2.8} />
+      <line x1={cx - 44} y1={cy - 54} x2={cx + 46} y2={cy + 36} strokeWidth={2.2} />
+      <line x1={cx - 36} y1={cy - 58} x2={cx + 54} y2={cy + 30} strokeWidth={1.8} />
+    </g>
+    {/* scar flecks near brow */}
+    <path
+      className="soft"
+      d={`M${cx - 58} ${cy - 36} L${cx - 50} ${cy - 22} M${cx + 44} ${cy + 28} L${cx + 52} ${cy + 40}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.3}
+      strokeLinecap="round"
+    />
+  </g>
+);
+
+/** Gojo Satoru — Six Eyes: wide lid + concentric iris rings */
+const SixEyes: React.FC<{ cx: number; cy: number }> = ({
+  cx,
+  cy,
+}): ReactElement => (
+  <g>
+    <EyeLid cx={cx} cy={cy} w={100} h={44} width={2.6} />
+    {/* upper lid extra crease — Gojo's sharp gaze */}
+    <path
+      className="soft"
+      d={`M${cx - 88} ${cy - 8} C${cx - 30} ${cy - 42} ${cx + 40} ${cy - 40} ${cx + 92} ${cy - 4}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+    />
+    <g className="breathe">
+      {[38, 28, 18, 10].map((radius: number, i: number) => (
+        <circle
+          key={radius}
+          cx={cx}
+          cy={cy}
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={i === 0 ? 2.2 : 1.35}
+          className={i % 2 === 1 ? "hot" : undefined}
+        />
+      ))}
+    </g>
+    {/* radial "sight" ticks */}
+    <g stroke="currentColor" strokeWidth={1.2} strokeLinecap="round">
+      {[0, 45, 90, 135].map((deg: number) => {
+        const rad = (deg * Math.PI) / 180;
+        return (
+          <line
+            key={deg}
+            x1={cx + Math.cos(rad) * 12}
+            y1={cy + Math.sin(rad) * 12}
+            x2={cx + Math.cos(rad) * 36}
+            y2={cy + Math.sin(rad) * 36}
+            className="soft"
+          />
+        );
+      })}
+    </g>
+    <circle cx={cx} cy={cy} r={3.5} fill="currentColor" className="hot" />
+  </g>
+);
+
+/** Killua — sharp cat-eye with vertical lightning slit */
+const KilluaEye: React.FC<{ cx: number; cy: number }> = ({
+  cx,
+  cy,
+}): ReactElement => (
+  <g>
+    {/* sharper / more angular lid than the shared almond */}
+    <path
+      d={`M${cx - 98} ${cy + 4}
+          C${cx - 50} ${cy - 46} ${cx + 20} ${cy - 52} ${cx + 100} ${cy - 6}
+          L${cx + 112} ${cy - 14}
+          C${cx + 55} ${cy + 38} ${cx - 40} ${cy + 44} ${cx - 98} ${cy + 4}Z`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={3}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      className="soft"
+      d={`M${cx - 86} ${cy + 6} C${cx - 20} ${cy + 36} ${cx + 40} ${cy + 32} ${cx + 92} ${cy}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.3}
+      strokeLinecap="round"
+    />
+    <circle
+      cx={cx}
+      cy={cy}
+      r={30}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+    />
+    {/* vertical cat slit */}
+    <path
+      className="hot"
+      d={`M${cx} ${cy - 26}
+          C${cx + 7} ${cy - 10} ${cx + 7} ${cy + 10} ${cx} ${cy + 26}
+          C${cx - 7} ${cy + 10} ${cx - 7} ${cy - 10} ${cx} ${cy - 26}Z`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.6}
+      strokeLinejoin="round"
+    />
+    <line
+      x1={cx}
+      y1={cy - 18}
+      x2={cx}
+      y2={cy + 18}
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      className="hot"
+    />
+    {/* lightning sparks near outer corner */}
+    <path
+      d={`M${cx + 72} ${cy - 28} L${cx + 82} ${cy - 12} L${cx + 74} ${cy - 10} L${cx + 90} ${cy + 8}
+          M${cx - 78} ${cy - 22} L${cx - 88} ${cy - 6} L${cx - 80} ${cy - 4}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="hot"
+    />
+  </g>
+);
+
+/** Rinnegan — concentric ripple rings (Sasuke / Madara) */
+const RinneganIris: React.FC<{ cx: number; cy: number; r?: number }> = ({
+  cx,
+  cy,
+  r = 40,
+}): ReactElement => (
+  <g>
+    <circle
+      cx={cx}
+      cy={cy}
+      r={r}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+    />
+    <g className="spin-slow" style={spinOrigin(cx, cy)}>
+      {[0.82, 0.64, 0.46, 0.3].map((scale: number, i: number) => (
+        <circle
+          key={scale}
+          cx={cx}
+          cy={cy}
+          r={r * scale}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={i === 0 ? 1.8 : 1.35}
+          className={i % 2 === 0 ? "breathe" : "soft"}
+        />
+      ))}
+      {/* evenly spaced tick marks on outermost ring */}
+      {Array.from({ length: 12 }, (_, i: number) => {
+        const rad = (i * 30 * Math.PI) / 180;
+        return (
+          <line
+            key={i}
+            x1={cx + Math.cos(rad) * r * 0.88}
+            y1={cy + Math.sin(rad) * r * 0.88}
+            x2={cx + Math.cos(rad) * r}
+            y2={cy + Math.sin(rad) * r}
+            stroke="currentColor"
+            strokeWidth={1.4}
+            strokeLinecap="round"
+          />
+        );
+      })}
+    </g>
+    <circle cx={cx} cy={cy} r={5} fill="none" stroke="currentColor" strokeWidth={2} />
+    <circle cx={cx} cy={cy} r={2.2} fill="currentColor" className="hot" />
+  </g>
+);
+
+/** Sung Jin-Woo — sharp glowing eye with vertical diamond highlight */
+const JinWooEye: React.FC<{ cx: number; cy: number }> = ({
+  cx,
+  cy,
+}): ReactElement => (
+  <g>
+    <EyeLid cx={cx} cy={cy} w={96} h={46} width={3} />
+    <circle
+      cx={cx}
+      cy={cy}
+      r={30}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.2}
+    />
+    <circle
+      cx={cx}
+      cy={cy}
+      r={18}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      className="soft"
+    />
+    {/* glowing vertical diamond / slit */}
+    <path
+      className="hot breathe"
+      d={`M${cx} ${cy - 22}
+          L${cx + 8} ${cy}
+          L${cx} ${cy + 22}
+          L${cx - 8} ${cy}Z`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.4}
+      strokeLinejoin="round"
+    />
+    <line
+      x1={cx}
+      y1={cy - 14}
+      x2={cx}
+      y2={cy + 14}
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      className="hot"
+    />
+    {/* aura strokes */}
+    <path
+      className="soft"
+      d={`M${cx - 70} ${cy - 18} C${cx - 50} ${cy - 34} ${cx - 30} ${cy - 36} ${cx - 12} ${cy - 28}
+          M${cx + 16} ${cy - 26} C${cx + 40} ${cy - 38} ${cx + 62} ${cy - 30} ${cx + 78} ${cy - 12}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.3}
+      strokeLinecap="round"
+    />
+  </g>
 );
 
 export const MangaEyes: React.FC<ChapterProps> = ({ kind }): ReactElement => (
   <EyeSvg viewBox="0 0 480 176" aria-hidden="true">
     {kind === "randomizer" ? (
       <g>
-        <Stroke width={3.2} d="M22 92 C72 37 143 28 211 69 C166 118 91 130 22 92Z" />
-        <Stroke width={1.4} className="soft" d="M31 89 C84 105 141 110 203 71" />
-        <circle cx="126" cy="79" r="38" fill="none" stroke="currentColor" strokeWidth="2.5" />
-        <circle cx="126" cy="79" r="8" fill="none" stroke="currentColor" strokeWidth="2.2" />
-        <Stroke width={4} d="M126 42 C140 54 143 67 135 77 C149 72 162 76 173 87 C158 92 145 91 135 84 C136 99 129 109 116 116 C114 101 116 90 121 83 C106 88 93 83 84 73 C99 66 111 67 121 74 C116 60 118 50 126 42Z" />
-        <Stroke width={1.5} className="hot" d="M75 25 L58 63 M87 22 L70 65 M99 25 L83 63" />
-
-        <Stroke width={3.4} d="M270 79 C319 43 395 43 458 87 C403 111 334 111 270 79Z" />
-        <Stroke width={2.2} d="M283 77 C329 66 390 67 447 86" />
-        <Stroke width={3.1} className="hot" d="M364 59 C375 68 379 80 371 94 C360 87 356 73 364 59Z" />
-        <Stroke width={1.3} className="soft" d="M302 110 C346 122 398 118 434 99" />
-        <Stroke width={2} d="M313 20 L296 64 M329 18 L313 67 M345 23 L329 66" />
+        {/* left: Sharingan (Madara) */}
+        <EyeLid cx={126} cy={84} w={98} h={50} width={3.1} />
+        <SharinganIris cx={126} cy={84} r={36} />
+        {/* right: Shanks */}
+        <ShanksEye cx={360} cy={84} />
       </g>
     ) : null}
 
     {kind === "crossAnalysis" ? (
       <g>
-        <Stroke width={2.8} d="M20 89 C69 38 151 29 215 78 C166 124 80 128 20 89Z" />
-        <Stroke width={1.2} className="soft" d="M28 88 C89 109 151 108 207 78" />
-        <circle cx="126" cy="79" r="40" fill="none" stroke="currentColor" strokeWidth="2" />
-        <circle cx="126" cy="79" r="29" fill="none" stroke="currentColor" strokeWidth="1.5" />
-        <circle cx="126" cy="79" r="17" fill="none" stroke="currentColor" strokeWidth="1.3" />
-        <circle className="hot" cx="126" cy="79" r="6" fill="currentColor" />
-        <Stroke width={1.5} d="M126 39V61 M126 97V119 M86 79H108 M144 79H166 M98 51L112 65 M154 51L140 65 M98 107L112 93 M154 107L140 93" />
-
-        <Stroke width={3.2} d="M263 87 C315 37 396 39 461 82 C404 122 320 121 263 87Z" />
-        <Stroke width={1.5} className="soft" d="M273 87 C329 103 390 106 451 82" />
-        <Stroke width={3} className="hot" d="M365 48 C379 60 381 80 369 101 C354 91 350 66 365 48Z" />
-        <Stroke width={1.8} d="M297 31 L314 57 L325 42 L341 64 M401 29 L389 55 L411 64 L394 82" />
-        <Stroke width={1.4} className="soft" d="M285 122 C330 132 403 132 442 104" />
+        {/* left: Gojo Six Eyes */}
+        <SixEyes cx={126} cy={84} />
+        {/* right: Killua */}
+        <KilluaEye cx={360} cy={84} />
       </g>
     ) : null}
 
     {kind === "contestBuilder" ? (
       <g>
-        <Stroke width={3} d="M20 88 C67 42 150 30 214 77 C164 125 77 127 20 88Z" />
-        <Stroke width={1.3} className="soft" d="M29 87 C83 109 154 107 205 78" />
-        <circle cx="126" cy="79" r="40" fill="none" stroke="currentColor" strokeWidth="2.2" />
-        <circle cx="126" cy="79" r="31" fill="none" stroke="currentColor" strokeWidth="1.7" />
-        <circle cx="126" cy="79" r="22" fill="none" stroke="currentColor" strokeWidth="1.5" />
-        <circle cx="126" cy="79" r="12" fill="none" stroke="currentColor" strokeWidth="1.5" />
-        <circle className="hot" cx="126" cy="79" r="4" fill="currentColor" />
-        <Stroke width={1.3} d="M86 78H166 M126 39V119" />
-
-        <Stroke width={3.5} d="M265 92 C319 38 400 40 461 76 C411 123 326 128 265 92Z" />
-        <Stroke width={1.4} className="soft" d="M275 90 C333 111 398 108 452 77" />
-        <Stroke width={3.2} className="hot" d="M365 48 C381 61 383 84 367 107 C350 91 350 64 365 48Z" />
-        <Stroke width={1.8} d="M365 38V118 M347 52L356 64 M384 51L376 65 M344 101L356 92 M386 101L376 91" />
-        <Stroke width={1.5} className="soft" d="M303 25 L316 57 M421 24 L404 58" />
+        {/* left: Rinnegan */}
+        <EyeLid cx={126} cy={84} w={96} h={50} width={2.9} />
+        <RinneganIris cx={126} cy={84} r={38} />
+        {/* right: Sung Jin-Woo */}
+        <JinWooEye cx={360} cy={84} />
       </g>
     ) : null}
   </EyeSvg>
@@ -266,14 +638,14 @@ const Watermark = styled.div`
   position: absolute;
   top: 106px;
   right: max(2vw, 18px);
-  width: min(39vw, 540px);
-  opacity: .08;
+  width: min(42vw, 560px);
+  opacity: 0.11;
 
   @media screen and (max-width: 760px) {
     top: 148px;
     right: -110px;
     width: 390px;
-    opacity: .055;
+    opacity: 0.07;
   }
 `;
 
@@ -427,13 +799,15 @@ const Note = styled.div`
 
 const BannerEyes = styled.div`
   width: 100%;
-  opacity: .88;
+  max-width: 460px;
+  justify-self: end;
+  opacity: 0.95;
 
   @media screen and (max-width: 720px) {
     position: absolute;
     right: -80px;
     width: 390px;
-    opacity: .12;
+    opacity: 0.14;
   }
 `;
 
