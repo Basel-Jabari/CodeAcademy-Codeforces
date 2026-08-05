@@ -24,6 +24,7 @@ import { downloadJson } from "../../services/jsonFile";
 import { downloadExcelSheets } from "../../services/excelExport";
 import ProblemLinkText from "../common/ProblemLinkText";
 import theme from "../../theme";
+import { usePersistentState } from "../../services/persistentState";
 
 interface Props {
   onError: (message: string) => void;
@@ -90,6 +91,77 @@ const newSlot = (): ContestSlot => ({
   count: 1,
   folded: false,
 });
+
+function nextSequence(ids: string[], prefix: string, current: number): number {
+  return ids.reduce((next: number, id: string) => {
+    const match: RegExpExecArray | null = new RegExp(`^${prefix}-(\\d+)$`).exec(
+      id,
+    );
+    return match ? Math.max(next, Number(match[1]) + 1) : next;
+  }, current);
+}
+
+function reviveSlots(stored: ContestSlot[]): ContestSlot[] {
+  if (!Array.isArray(stored) || stored.length === 0) return [newSlot()];
+
+  slotSeq = nextSequence(
+    stored.map((slot: ContestSlot) => slot.id),
+    "slot",
+    slotSeq,
+  );
+
+  return stored.map((slot: ContestSlot): ContestSlot => ({
+    ...slot,
+    expression:
+      slot.expression && typeof slot.expression.type === "string"
+        ? regenerateNodeIds(slot.expression)
+        : createDefaultExpression(),
+    rating: {
+      min: Number.isFinite(Number(slot.rating && slot.rating.min))
+        ? Number(slot.rating.min)
+        : minRating,
+      max: Number.isFinite(Number(slot.rating && slot.rating.max))
+        ? Number(slot.rating.max)
+        : maxRating,
+    },
+    count: Math.max(0, Math.floor(Number(slot.count) || 0)),
+    folded: Boolean(slot.folded),
+  }));
+}
+
+function reviveRows(stored: BuiltRow[]): BuiltRow[] {
+  if (!Array.isArray(stored)) return [];
+  rowSeq = nextSequence(
+    stored.map((row: BuiltRow) => row.rowId),
+    "row",
+    rowSeq,
+  );
+  return stored;
+}
+
+function reviveColumnOrder(stored: ColumnKey[]): ColumnKey[] {
+  const restored: ColumnKey[] = [];
+  if (Array.isArray(stored)) {
+    stored.forEach((column: ColumnKey) => {
+      if (
+        defaultColumnOrder.indexOf(column) !== -1 &&
+        restored.indexOf(column) === -1
+      ) {
+        restored.push(column);
+      }
+    });
+  }
+  defaultColumnOrder.forEach((column: ColumnKey) => {
+    if (restored.indexOf(column) === -1) restored.push(column);
+  });
+  return restored;
+}
+
+function reviveSortColumn(stored: ColumnKey | null): ColumnKey | null {
+  return stored !== null && defaultColumnOrder.indexOf(stored) !== -1
+    ? stored
+    : null;
+}
 
 const Pane = styled.div`
   display: flex;
@@ -359,12 +431,26 @@ const DragIndexCell = styled.td<{ $dragging?: boolean }>`
 `;
 
 const ContestBuilder: React.FC<Props> = (props: Props): ReactElement => {
-  const [slots, setSlots] = useState<ContestSlot[]>([newSlot()]);
-  const [rows, setRows] = useState<BuiltRow[]>([]);
-  const [report, setReport] = useState<string>("");
+  const [slots, setSlots] = usePersistentState<ContestSlot[]>(
+    "contestBuilder.slots",
+    () => [newSlot()],
+    reviveSlots,
+  );
+  const [rows, setRows] = usePersistentState<BuiltRow[]>(
+    "contestBuilder.rows",
+    [],
+    reviveRows,
+  );
+  const [report, setReport] = usePersistentState<string>(
+    "contestBuilder.report",
+    "",
+  );
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  const [columnOrder, setColumnOrder] =
-    useState<ColumnKey[]>(defaultColumnOrder);
+  const [columnOrder, setColumnOrder] = usePersistentState<ColumnKey[]>(
+    "contestBuilder.columnOrder",
+    defaultColumnOrder,
+    reviveColumnOrder,
+  );
   const [dragRowIndex, setDragRowIndex] = useState<number | null>(null);
   const [dragColumn, setDragColumn] = useState<ColumnKey | null>(null);
   const [dragSlotIndex, setDragSlotIndex] = useState<number | null>(null);
@@ -372,8 +458,16 @@ const ContestBuilder: React.FC<Props> = (props: Props): ReactElement => {
     null,
   );
   const [renamingSlotId, setRenamingSlotId] = useState<string | null>(null);
-  const [sortColumn, setSortColumn] = useState<ColumnKey | null>(null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortColumn, setSortColumn] = usePersistentState<ColumnKey | null>(
+    "contestBuilder.sortColumn",
+    null,
+    reviveSortColumn,
+  );
+  const [sortDirection, setSortDirection] = usePersistentState<"asc" | "desc">(
+    "contestBuilder.sortDirection",
+    "asc",
+    (stored: "asc" | "desc") => (stored === "desc" ? "desc" : "asc"),
+  );
   const [redrawingRowId, setRedrawingRowId] = useState<string | null>(null);
   const fileRefs = React.useRef<{ [id: string]: HTMLInputElement | null }>({});
   const importFileRef = React.useRef<HTMLInputElement | null>(null);

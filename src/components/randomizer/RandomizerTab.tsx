@@ -6,11 +6,15 @@ import { TagNode } from "../../models/TagExpression";
 import ProblemsSection from "../problems-section/ProblemsSection";
 import { getRandomProblem } from "../../services/problems";
 import { parseHandles } from "../../services/submissions";
-import { createDefaultExpression } from "../../services/tagExpression";
+import {
+  createDefaultExpression,
+  regenerateNodeIds,
+} from "../../services/tagExpression";
 import {
   setProblemsListToStorage,
   clearProblemsList,
 } from "../../services/storage";
+import { usePersistentState } from "../../services/persistentState";
 import ClearButton from "../clear-button/ClearButton";
 import Options from "../options/Options";
 import ExpressionBuilder from "../expression/ExpressionBuilder";
@@ -75,10 +79,15 @@ const HistoryTitle = styled.div`
 `;
 
 const RandomizerTab: React.FC<Props> = (props: Props): ReactElement => {
-  const [expression, setExpression] = useState<TagNode>(
-    createDefaultExpression(),
+  const [expression, setExpression] = usePersistentState<TagNode>(
+    "randomizer.expression",
+    createDefaultExpression,
+    regenerateNodeIds,
   );
-  const [participantHandles, setParticipantHandles] = useState<string>("");
+  const [participantHandles, setParticipantHandles] = usePersistentState<string>(
+    "randomizer.participantHandles",
+    "",
+  );
   const [problemsList, setProblemsList] = useState<
     Array<{ problem: Problem; problemStatistics: ProblemStatistics }>
   >(props.initialProblemsList);
