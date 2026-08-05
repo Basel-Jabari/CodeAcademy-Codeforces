@@ -100,20 +100,17 @@ const BrandHeader: React.FC = (): ReactElement => (
       >
         <Logo src={assets.images.codeforcesIcon} alt="Codeforces" />
       </LogoLink>
-      <Alliance aria-label="Codeforces and Palestine Polytechnic University">
+      <Alliance aria-label="Codeforces and PPU Code Academy">
         <Cross>×</Cross>
         <AllianceLabel>Code Academy</AllianceLabel>
       </Alliance>
       <LogoLink
-        href="https://ppu.edu/"
+        href="https://linktr.ee/PPUCodeAcademy12"
         target="_blank"
         rel="noopener noreferrer"
-        title="Palestine Polytechnic University"
+        title="PPU Code Academy"
       >
-        <Logo
-          src={assets.images.ppuccIcon}
-          alt="Palestine Polytechnic University"
-        />
+        <Logo src={assets.images.ppuccIcon} alt="PPU Code Academy" />
       </LogoLink>
     </Brand>
   </HeaderShell>
