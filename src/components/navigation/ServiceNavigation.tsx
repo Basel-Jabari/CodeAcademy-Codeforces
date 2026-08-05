@@ -49,21 +49,39 @@ const tabs: TabDesign[] = [
 ];
 
 const fireFlicker = keyframes`
-  0%, 100% { transform: scaleY(1) scaleX(1); opacity: .9; }
-  35% { transform: scaleY(1.18) scaleX(.92); opacity: 1; }
-  70% { transform: scaleY(.88) scaleX(1.1); opacity: .75; }
+  0%, 100% { transform: scaleY(1) scaleX(1) translateY(0); }
+  30% { transform: scaleY(1.16) scaleX(.93) translateY(-1px); }
+  55% { transform: scaleY(.93) scaleX(1.07) translateY(.5px); }
+  80% { transform: scaleY(1.08) scaleX(.97) translateY(-.5px); }
+`;
+
+const emberFloat = keyframes`
+  0% { transform: translateY(4px) scale(.6); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translateY(-14px) scale(1); opacity: 0; }
 `;
 
 const waveMove = keyframes`
   0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  100% { transform: translateX(-40px); }
+`;
+
+const dropFall = keyframes`
+  0% { transform: translateY(-6px); opacity: 0; }
+  30% { opacity: .9; }
+  100% { transform: translateY(8px); opacity: 0; }
 `;
 
 const boltFlash = keyframes`
-  0%, 100% { opacity: .55; filter: drop-shadow(0 0 2px currentColor); }
-  40% { opacity: 1; filter: drop-shadow(0 0 10px currentColor); }
-  55% { opacity: .35; }
-  70% { opacity: .95; }
+  0%, 100% { opacity: .9; }
+  42% { opacity: .3; }
+  48% { opacity: 1; }
+  62% { opacity: .55; }
+`;
+
+const boltSpark = keyframes`
+  0%, 100% { opacity: 0; transform: scale(.4); }
+  45% { opacity: .9; transform: scale(1); }
 `;
 
 const Shell = styled.nav`
@@ -219,10 +237,14 @@ const EffectSlot = styled.span<{
   width: 34px;
   height: 34px;
   color: currentColor;
-  opacity: ${(props) => (props.$live ? 1 : props.$active ? 0.85 : 0.4)};
+  opacity: ${(props) => (props.$live ? 1 : props.$active ? 0.9 : 0.42)};
   transform: scale(${(props) => (props.$live ? 1.45 : 1)});
   transform-origin: center bottom;
-  transition: transform 380ms ease, opacity 280ms ease;
+  filter: drop-shadow(
+    0 0 ${(props) => (props.$live ? "10px" : props.$active ? "5px" : "0px")}
+      currentColor
+  );
+  transition: transform 380ms ease, opacity 280ms ease, filter 380ms ease;
   pointer-events: none;
 
   @media screen and (max-width: 680px) {
@@ -234,74 +256,98 @@ const EffectSlot = styled.span<{
   }
 `;
 
-const FireGlyph = styled.svg<{ $live: boolean }>`
+const Glyph = styled.svg`
   width: 100%;
   height: 100%;
   overflow: visible;
+`;
 
-  path {
-    fill: currentColor;
+const FireGlyph = styled(Glyph)<{ $live: boolean }>`
+  .flame {
+    transform-box: fill-box;
+    transform-origin: center bottom;
     ${(props) =>
       props.$live
         ? css`
-            animation: ${fireFlicker} 0.55s ease-in-out infinite;
-            transform-origin: center bottom;
-            transform-box: fill-box;
+            animation: ${fireFlicker} 0.7s ease-in-out infinite;
           `
         : ""}
   }
 
-  path:nth-child(2) {
-    opacity: 0.7;
-    animation-delay: ${(props) => (props.$live ? "-0.18s" : "0s")};
+  .flame-mid {
+    animation-delay: ${(props) => (props.$live ? "-0.22s" : "0s")};
   }
-  path:nth-child(3) {
-    opacity: 0.45;
-    animation-delay: ${(props) => (props.$live ? "-0.32s" : "0s")};
+
+  .flame-core {
+    animation-delay: ${(props) => (props.$live ? "-0.4s" : "0s")};
+  }
+
+  .ember {
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
+    ${(props) =>
+      props.$live
+        ? css`
+            animation: ${emberFloat} 1.4s ease-out infinite;
+          `
+        : ""}
+  }
+
+  .ember-b {
+    animation-delay: ${(props) => (props.$live ? "-0.7s" : "0s")};
   }
 `;
 
-const WaveGlyph = styled.svg<{ $live: boolean }>`
-  width: 100%;
-  height: 100%;
+const WaveGlyph = styled(Glyph)<{ $live: boolean }>`
   overflow: hidden;
 
   .track {
     ${(props) =>
       props.$live
         ? css`
-            animation: ${waveMove} 1.1s linear infinite;
+            animation: ${waveMove} 1.6s linear infinite;
           `
         : ""}
   }
 
-  path {
-    fill: currentColor;
-  }
-`;
-
-const BoltGlyph = styled.svg<{ $live: boolean }>`
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-
-  path {
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2.2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  .drop {
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
     ${(props) =>
       props.$live
         ? css`
-            animation: ${boltFlash} 0.9s ease-in-out infinite;
+            animation: ${dropFall} 1.5s ease-in infinite;
+          `
+        : ""}
+  }
+`;
+
+const BoltGlyph = styled(Glyph)<{ $live: boolean }>`
+  .bolt {
+    ${(props) =>
+      props.$live
+        ? css`
+            animation: ${boltFlash} 1.1s steps(1, end) infinite;
           `
         : ""}
   }
 
-  path:nth-child(2) {
-    opacity: 0.55;
-    animation-delay: ${(props) => (props.$live ? "-0.25s" : "0s")};
+  .spark {
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
+    ${(props) =>
+      props.$live
+        ? css`
+            animation: ${boltSpark} 1.1s ease-out infinite;
+          `
+        : ""}
+  }
+
+  .spark-b {
+    animation-delay: ${(props) => (props.$live ? "-0.45s" : "0s")};
   }
 `;
 
@@ -314,32 +360,126 @@ const TabEffect: React.FC<{
   <EffectSlot $live={live} $active={active} style={{ color: accent }}>
     {kind === "randomizer" ? (
       <FireGlyph $live={live} viewBox="0 0 40 40" aria-hidden="true">
-        <path d="M20 36 C12 36 8 30 9 23 C10 18 14 15 16 10 C17 16 20 18 22 14 C26 20 30 22 30 28 C30 33 26 36 20 36Z" />
-        <path d="M20 34 C15 34 13 30 14 26 C15 23 18 21 19 18 C20 22 22 23 23 21 C26 24 27 26 27 29 C27 32 24 34 20 34Z" />
-        <path d="M20 30 C17 30 16 28 17 26 C18 25 19 24 20 23 C21 25 22 26 23 27 C23 29 22 30 20 30Z" />
+        <defs>
+          <linearGradient id="tab-fire-outer" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stopColor="#ff3d2e" />
+            <stop offset="55%" stopColor="#ff6a3c" />
+            <stop offset="100%" stopColor="#ffb347" />
+          </linearGradient>
+          <linearGradient id="tab-fire-core" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stopColor="#ffd166" />
+            <stop offset="100%" stopColor="#fff3c4" />
+          </linearGradient>
+        </defs>
+        {/* outer flame */}
+        <path
+          className="flame"
+          fill="url(#tab-fire-outer)"
+          d="M20 37 C11 37 6.5 30.5 8 23.5 C9.2 17.8 13.5 14.6 15.6 8.4
+             C16.4 6.2 17 4.2 17.2 2 C21.4 5.6 23.2 10 22.6 14.6
+             C25.4 12.9 26.7 10.4 26.8 7.4 C31 12 33.4 17.4 33 23.2
+             C32.5 31 27 37 20 37Z"
+        />
+        {/* mid flame */}
+        <path
+          className="flame flame-mid"
+          fill="url(#tab-fire-core)"
+          opacity="0.85"
+          d="M20 36 C15 36 12 32.2 12.7 27.6 C13.3 23.8 16 21.6 17.4 17.8
+             C18 16.3 18.3 15 18.4 13.4 C21.2 16 22.4 19 22 22.2
+             C23.6 21 24.4 19.6 24.6 17.8 C27.2 21 28.4 24.2 28 27.6
+             C27.5 32.6 24.4 36 20 36Z"
+        />
+        {/* white-hot core */}
+        <path
+          className="flame flame-core"
+          fill="#fffdf2"
+          opacity="0.9"
+          d="M20 34.6 C17.6 34.6 16.2 32.8 16.6 30.4 C17 28.4 18.4 27.2 19.2 25.2
+             C20.8 27 21.6 28.6 21.4 30.2 C22.2 29.6 22.6 28.8 22.8 27.8
+             C23.9 29.6 24.2 31.2 23.8 32.4 C23.3 33.9 21.9 34.6 20 34.6Z"
+        />
+        <circle className="ember" cx="12" cy="16" r="1.5" fill="#ffb347" />
+        <circle className="ember ember-b" cx="28" cy="13" r="1.2" fill="#ff6a3c" />
       </FireGlyph>
     ) : null}
     {kind === "crossAnalysis" ? (
       <WaveGlyph $live={live} viewBox="0 0 40 40" aria-hidden="true">
-        <g className="track">
-          <path d="M0 24 C5 18 10 30 15 24 C20 18 25 30 30 24 C35 18 40 30 45 24 L45 40 L0 40Z" />
-          <path d="M0 28 C5 23 10 33 15 28 C20 23 25 33 30 28 C35 23 40 33 45 28 L45 40 L0 40Z" opacity="0.55" />
+        <defs>
+          <linearGradient id="tab-wave-front" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#67e8f9" />
+            <stop offset="100%" stopColor="#0e7490" />
+          </linearGradient>
+          <linearGradient id="tab-wave-back" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#22d3ee" />
+            <stop offset="100%" stopColor="#0b5563" />
+          </linearGradient>
+          <clipPath id="tab-wave-clip">
+            <rect x="0" y="0" width="40" height="40" rx="9" />
+          </clipPath>
+        </defs>
+        <g clipPath="url(#tab-wave-clip)">
+          {/* curling crest */}
           <path
-            d="M0 24 C5 18 10 30 15 24 C20 18 25 30 30 24 C35 18 40 30 45 24 L45 40 L0 40Z"
-            transform="translate(45,0)"
+            fill="url(#tab-wave-back)"
+            opacity="0.75"
+            d="M2 20 C7 13 13 13 18 18 C22 22 26 23 30 20 C33 17.6 35.6 17.4 38 19
+               L38 40 L2 40Z"
           />
           <path
-            d="M0 28 C5 23 10 33 15 28 C20 23 25 33 30 28 C35 23 40 33 45 28 L45 40 L0 40Z"
-            transform="translate(45,0)"
-            opacity="0.55"
+            fill="none"
+            stroke="#c7f4ff"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            opacity="0.85"
+            d="M6 17.5 C9.5 13.5 14 13.8 17.5 17.5 C20.5 20.6 24 21.6 27.4 19.6"
           />
+          <g className="track">
+            <path
+              fill="url(#tab-wave-front)"
+              d="M-40 27 C-32 21 -24 33 -16 27 C-8 21 0 33 8 27 C16 21 24 33 32 27
+                 C40 21 48 33 56 27 L56 44 L-40 44Z"
+            />
+            <path
+              fill="#0b3d4a"
+              opacity="0.55"
+              d="M-40 31 C-32 26 -24 37 -16 31 C-8 26 0 37 8 31 C16 26 24 37 32 31
+                 C40 26 48 37 56 31 L56 44 L-40 44Z"
+            />
+          </g>
+          <circle className="drop" cx="24" cy="12" r="1.6" fill="#a5f3fc" />
         </g>
       </WaveGlyph>
     ) : null}
     {kind === "contestBuilder" ? (
       <BoltGlyph $live={live} viewBox="0 0 40 40" aria-hidden="true">
-        <path d="M22 4 L14 20 H21 L16 36 L30 16 H22 Z" />
-        <path d="M28 8 L24 16 H28 L25 24" />
+        <defs>
+          <linearGradient id="tab-bolt" x1="0" y1="0" x2="0.4" y2="1">
+            <stop offset="0%" stopColor="#e9d5ff" />
+            <stop offset="45%" stopColor="#c084fc" />
+            <stop offset="100%" stopColor="#7c3aed" />
+          </linearGradient>
+          <filter id="tab-bolt-glow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="1.6" result="b" />
+            <feMerge>
+              <feMergeNode in="b" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <g className="bolt" filter="url(#tab-bolt-glow)">
+          <path
+            fill="url(#tab-bolt)"
+            d="M23.5 2 L11 21.5 H18.2 L15.5 38 L29.5 17.5 H21.8 L26 2 Z"
+          />
+          <path
+            fill="#fbf5ff"
+            opacity="0.75"
+            d="M22.6 6 L15.4 19.6 H19 L17.6 30 L24.4 18.6 H20.6 L23.4 6 Z"
+          />
+        </g>
+        <circle className="spark" cx="31" cy="10" r="1.5" fill="#e9d5ff" />
+        <circle className="spark spark-b" cx="9" cy="29" r="1.2" fill="#c084fc" />
       </BoltGlyph>
     ) : null}
   </EffectSlot>

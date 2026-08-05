@@ -7,9 +7,9 @@ interface Props {
   size?: number;
 }
 
-const glowPulse = keyframes`
-  0%, 100% { filter: drop-shadow(0 0 8px var(--cf-glow)); }
-  50% { filter: drop-shadow(0 0 22px var(--cf-glow)) drop-shadow(0 0 36px var(--cf-secondary-glow)); }
+const auraPulse = keyframes`
+  0%, 100% { filter: drop-shadow(0 0 6px var(--cf-glow)); }
+  50% { filter: drop-shadow(0 0 18px var(--cf-glow)) drop-shadow(0 0 34px var(--cf-secondary-glow)); }
 `;
 
 const spin = keyframes`
@@ -17,20 +17,26 @@ const spin = keyframes`
   to { transform: rotate(360deg); }
 `;
 
-const ringBreathe = keyframes`
-  0%, 100% { opacity: 0.45; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.035); }
+const counterSpin = keyframes`
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
 `;
 
-const gojoShimmer = keyframes`
-  0%, 100% { stroke-dashoffset: 0; opacity: 0.55; }
-  50% { stroke-dashoffset: 24; opacity: 1; }
+const dilate = keyframes`
+  0%, 100% { transform: scale(1); }
+  45% { transform: scale(0.82); }
+  60% { transform: scale(1.06); }
 `;
 
-const rinneganWave = keyframes`
-  0% { opacity: 0.35; }
-  40% { opacity: 1; }
-  100% { opacity: 0.35; }
+const rippleOut = keyframes`
+  0% { transform: scale(0.32); opacity: 0; }
+  25% { opacity: 0.85; }
+  100% { transform: scale(1); opacity: 0; }
+`;
+
+const sheen = keyframes`
+  0%, 100% { opacity: 0.35; transform: translate(0, 0); }
+  50% { opacity: 0.8; transform: translate(2px, -2px); }
 `;
 
 const Frame = styled.svg<{ $size: number }>`
@@ -38,211 +44,322 @@ const Frame = styled.svg<{ $size: number }>`
   width: ${(props) => props.$size}px;
   height: ${(props) => props.$size}px;
   overflow: visible;
-  color: var(--cf-accent-bright);
-  animation: ${glowPulse} 4.8s ease-in-out infinite;
-
-  .soft {
-    opacity: 0.38;
-  }
-
-  .hot {
-    color: var(--cf-secondary);
-  }
+  animation: ${auraPulse} 5s ease-in-out infinite;
 
   .spin {
     transform-box: view-box;
     transform-origin: 50px 50px;
-    animation: ${spin} 12s linear infinite;
+    animation: ${spin} 16s linear infinite;
   }
 
-  .spin-slow {
+  .spin-rev {
     transform-box: view-box;
     transform-origin: 50px 50px;
-    animation: ${spin} 26s linear infinite;
+    animation: ${counterSpin} 30s linear infinite;
   }
 
-  .breathe {
+  .pupil {
     transform-box: view-box;
     transform-origin: 50px 50px;
-    animation: ${ringBreathe} 3.4s ease-in-out infinite;
-  }
-
-  .shimmer {
-    stroke-dasharray: 8 10;
-    animation: ${gojoShimmer} 3.2s ease-in-out infinite;
+    animation: ${dilate} 6s ease-in-out infinite;
   }
 
   .ripple {
-    animation: ${rinneganWave} 2.8s ease-in-out infinite;
+    transform-box: view-box;
+    transform-origin: 50px 50px;
+    animation: ${rippleOut} 3.4s ease-out infinite;
+  }
+
+  .sheen {
+    animation: ${sheen} 4.5s ease-in-out infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;
     .spin,
-    .spin-slow,
-    .breathe,
-    .shimmer,
-    .ripple {
+    .spin-rev,
+    .pupil,
+    .ripple,
+    .sheen {
       animation: none;
     }
   }
 `;
 
-/** Madara Eternal Mangekyō — circular iris only */
+/** Dark sclera bowl + rim shared by every iris */
+const EyeBall: React.FC<{ id: string }> = ({ id }): ReactElement => (
+  <g>
+    <circle cx={50} cy={50} r={46} fill={`url(#${id}-bowl)`} />
+    <circle
+      cx={50}
+      cy={50}
+      r={46}
+      fill="none"
+      stroke="var(--cf-accent-deep)"
+      strokeWidth={1.6}
+      opacity={0.9}
+    />
+  </g>
+);
+
+/** Glass highlight so the eye reads as a sphere, not a flat disc */
+const Highlight: React.FC = (): ReactElement => (
+  <g className="sheen">
+    <ellipse cx={36} cy={32} rx={13} ry={9} fill="#ffffff" opacity={0.22} transform="rotate(-28 36 32)" />
+    <ellipse cx={62} cy={68} rx={7} ry={4} fill="#ffffff" opacity={0.09} transform="rotate(-28 62 68)" />
+  </g>
+);
+
+/** Madara Eternal Mangekyō Sharingan */
 const MadaraIris: React.FC = (): ReactElement => {
-  const cx = 50;
-  const cy = 50;
-  const r = 42;
-  const blade = `M0 ${-r * 0.1}
-    C${r * 0.2} ${-r * 0.32} ${r * 0.24} ${-r * 0.68} 0 ${-r * 0.9}
-    C${-r * 0.09} ${-r * 0.68} ${-r * 0.14} ${-r * 0.38} ${-r * 0.07} ${-r * 0.16}
-    C${-r * 0.02} ${-r * 0.1} ${r * 0.02} ${-r * 0.08} 0 ${-r * 0.1}Z`;
+  const id = "eye-madara";
+  // one curved pinwheel blade, repeated 4x
+  const blade = `M0 -6
+    C10 -12 20 -22 15 -36
+    C10 -30 2 -26 -3 -20
+    C-6 -15 -6 -10 0 -6Z`;
 
   return (
     <g>
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="currentColor" strokeWidth={2.8} />
+      <defs>
+        <radialGradient id={`${id}-bowl`} cx="38%" cy="32%">
+          <stop offset="0%" stopColor="#3d0a12" />
+          <stop offset="65%" stopColor="#1a0407" />
+          <stop offset="100%" stopColor="#080203" />
+        </radialGradient>
+        <radialGradient id={`${id}-iris`} cx="40%" cy="34%">
+          <stop offset="0%" stopColor="#ff5a6e" />
+          <stop offset="45%" stopColor="#e01838" />
+          <stop offset="100%" stopColor="#7d0518" />
+        </radialGradient>
+        <filter id={`${id}-glow`} x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="2.6" result="b" />
+          <feMerge>
+            <feMergeNode in="b" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <EyeBall id={id} />
+
+      <circle cx={50} cy={50} r={35} fill={`url(#${id}-iris)`} />
       <circle
-        className="soft"
-        cx={cx}
-        cy={cy}
-        r={r * 0.9}
+        cx={50}
+        cy={50}
+        r={35}
         fill="none"
-        stroke="currentColor"
-        strokeWidth={1}
+        stroke="#ff8a99"
+        strokeWidth={1.2}
+        opacity={0.5}
       />
-      <g className="spin">
+
+      {/* pinwheel */}
+      <g className="spin" filter={`url(#${id}-glow)`}>
         {[0, 90, 180, 270].map((angle: number) => (
-          <g key={angle} transform={`translate(${cx} ${cy}) rotate(${angle})`}>
-            <path
-              d={blade}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2.5}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              className="soft"
-              d={`M${r * 0.05} ${-r * 0.2} C${r * 0.14} ${-r * 0.4} ${r * 0.12} ${-r * 0.62} ${r * 0.03} ${-r * 0.78}`}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={1.2}
-              strokeLinecap="round"
-            />
-          </g>
+          <path
+            key={angle}
+            d={blade}
+            transform={`translate(50 50) rotate(${angle})`}
+            fill="#12000a"
+          />
         ))}
+        <circle cx={50} cy={50} r={13} fill="#12000a" />
       </g>
-      <circle
-        className="hot breathe"
-        cx={cx}
-        cy={cy}
-        r={r * 0.26}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-      />
-      <circle cx={cx} cy={cy} r={r * 0.12} fill="none" stroke="currentColor" strokeWidth={2.2} />
-      <circle cx={cx} cy={cy} r={r * 0.05} fill="currentColor" />
+
+      {/* pupil */}
+      <g className="pupil">
+        <circle cx={50} cy={50} r={9} fill="#0a0003" />
+        <circle
+          cx={50}
+          cy={50}
+          r={9}
+          fill="none"
+          stroke="#ff5a6e"
+          strokeWidth={1.4}
+          opacity={0.75}
+        />
+      </g>
+
+      <Highlight />
     </g>
   );
 };
 
-/** Gojo Six Eyes — concentric rings */
+/** Gojo Satoru — Six Eyes */
 const GojoIris: React.FC = (): ReactElement => {
-  const cx = 50;
-  const cy = 50;
+  const id = "eye-gojo";
   return (
     <g>
-      <circle cx={cx} cy={cy} r={42} fill="none" stroke="currentColor" strokeWidth={2.5} />
-      <g className="breathe">
-        {[34, 26, 18, 11].map((radius: number, i: number) => (
+      <defs>
+        <radialGradient id={`${id}-bowl`} cx="38%" cy="32%">
+          <stop offset="0%" stopColor="#0b3a48" />
+          <stop offset="65%" stopColor="#04141c" />
+          <stop offset="100%" stopColor="#01070b" />
+        </radialGradient>
+        <radialGradient id={`${id}-iris`} cx="40%" cy="32%">
+          <stop offset="0%" stopColor="#d7fbff" />
+          <stop offset="30%" stopColor="#5fe3ff" />
+          <stop offset="70%" stopColor="#12a3c9" />
+          <stop offset="100%" stopColor="#063e56" />
+        </radialGradient>
+        <radialGradient id={`${id}-core`} cx="50%" cy="50%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="55%" stopColor="#8ceeff" />
+          <stop offset="100%" stopColor="#1b9fc4" stopOpacity="0" />
+        </radialGradient>
+        <filter id={`${id}-glow`} x="-70%" y="-70%" width="240%" height="240%">
+          <feGaussianBlur stdDeviation="3.2" result="b" />
+          <feMerge>
+            <feMergeNode in="b" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <EyeBall id={id} />
+
+      <circle cx={50} cy={50} r={36} fill={`url(#${id}-iris)`} />
+
+      {/* concentric limitless rings */}
+      <g className="spin-rev" filter={`url(#${id}-glow)`}>
+        {[30, 23, 16].map((radius: number, i: number) => (
           <circle
             key={radius}
-            className={i % 2 === 1 ? "hot shimmer" : "shimmer"}
-            cx={cx}
-            cy={cy}
+            cx={50}
+            cy={50}
             r={radius}
             fill="none"
-            stroke="currentColor"
-            strokeWidth={i === 0 ? 2 : 1.35}
-            style={{ animationDelay: `${i * 0.18}s` }}
+            stroke="#e8fdff"
+            strokeWidth={i === 0 ? 1.7 : 1.2}
+            opacity={0.55 - i * 0.1}
+            strokeDasharray={i === 1 ? "7 5" : undefined}
           />
         ))}
       </g>
-      <polygon
-        className="soft"
-        points={[0, 1, 2, 3, 4, 5]
-          .map((i: number) => {
-            const rad = ((i * 60 - 90) * Math.PI) / 180;
-            return `${cx + Math.cos(rad) * 20},${cy + Math.sin(rad) * 20}`;
-          })
-          .join(" ")}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.15}
-      />
-      {[0, 45, 90, 135].map((deg: number) => {
-        const rad = (deg * Math.PI) / 180;
-        return (
-          <line
-            key={deg}
-            className="soft"
-            x1={cx + Math.cos(rad) * 8}
-            y1={cy + Math.sin(rad) * 8}
-            x2={cx + Math.cos(rad) * 38}
-            y2={cy + Math.sin(rad) * 38}
-            stroke="currentColor"
-            strokeWidth={1.1}
-            strokeLinecap="round"
-          />
-        );
-      })}
-      <circle className="hot" cx={cx} cy={cy} r={3.4} fill="currentColor" />
+
+      {/* expanding infinity ripples */}
+      {[0, 1.7].map((delay: number) => (
+        <circle
+          key={delay}
+          className="ripple"
+          cx={50}
+          cy={50}
+          r={34}
+          fill="none"
+          stroke="#bff5ff"
+          strokeWidth={1.6}
+          style={{ animationDelay: `${delay}s` }}
+        />
+      ))}
+
+      <circle cx={50} cy={50} r={20} fill={`url(#${id}-core)`} opacity={0.85} />
+
+      <g className="pupil">
+        <ellipse cx={50} cy={50} rx={5.5} ry={11} fill="#04222e" />
+        <ellipse
+          cx={50}
+          cy={50}
+          rx={5.5}
+          ry={11}
+          fill="none"
+          stroke="#d7fbff"
+          strokeWidth={1.1}
+          opacity={0.7}
+        />
+      </g>
+
+      <Highlight />
     </g>
   );
 };
 
-/** Rinnegan — ripple rings */
+/** Rinnegan — Madara's ripple eye */
 const RinneganIris: React.FC = (): ReactElement => {
-  const cx = 50;
-  const cy = 50;
-  const r = 42;
+  const id = "eye-rinnegan";
   return (
     <g>
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="currentColor" strokeWidth={2.6} />
-      <g className="spin-slow">
-        {[0.84, 0.68, 0.52, 0.36, 0.22].map((scale: number, i: number) => (
+      <defs>
+        <radialGradient id={`${id}-bowl`} cx="38%" cy="32%">
+          <stop offset="0%" stopColor="#2b1150" />
+          <stop offset="65%" stopColor="#120724" />
+          <stop offset="100%" stopColor="#06030d" />
+        </radialGradient>
+        <radialGradient id={`${id}-iris`} cx="40%" cy="34%">
+          <stop offset="0%" stopColor="#e3c8ff" />
+          <stop offset="35%" stopColor="#a678ff" />
+          <stop offset="75%" stopColor="#6b34c9" />
+          <stop offset="100%" stopColor="#2d1160" />
+        </radialGradient>
+        <filter id={`${id}-glow`} x="-70%" y="-70%" width="240%" height="240%">
+          <feGaussianBlur stdDeviation="2.4" result="b" />
+          <feMerge>
+            <feMergeNode in="b" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <EyeBall id={id} />
+
+      <circle cx={50} cy={50} r={36} fill={`url(#${id}-iris)`} />
+
+      {/* ripple rings — the defining Rinnegan pattern */}
+      <g filter={`url(#${id}-glow)`}>
+        {[31, 25, 19, 13].map((radius: number, i: number) => (
           <circle
-            key={scale}
-            className={i % 2 === 0 ? "ripple" : "soft"}
-            cx={cx}
-            cy={cy}
-            r={r * scale}
+            key={radius}
+            cx={50}
+            cy={50}
+            r={radius}
             fill="none"
-            stroke="currentColor"
-            strokeWidth={i === 0 ? 1.7 : 1.25}
-            style={{ animationDelay: `${i * 0.22}s` }}
+            stroke="#1c0b38"
+            strokeWidth={2}
+            opacity={0.85 - i * 0.06}
           />
         ))}
-        {Array.from({ length: 16 }, (_, i: number) => {
-          const rad = (i * 22.5 * Math.PI) / 180;
-          return (
-            <line
-              key={i}
-              className="soft"
-              x1={cx + Math.cos(rad) * r * 0.9}
-              y1={cy + Math.sin(rad) * r * 0.9}
-              x2={cx + Math.cos(rad) * r}
-              y2={cy + Math.sin(rad) * r}
-              stroke="currentColor"
-              strokeWidth={1.2}
-              strokeLinecap="round"
-            />
-          );
-        })}
+        {[31, 25, 19, 13].map((radius: number) => (
+          <circle
+            key={`h-${radius}`}
+            cx={50}
+            cy={50}
+            r={radius - 1}
+            fill="none"
+            stroke="#d9bcff"
+            strokeWidth={0.6}
+            opacity={0.3}
+          />
+        ))}
       </g>
-      <circle cx={cx} cy={cy} r={6} fill="none" stroke="currentColor" strokeWidth={2} />
-      <circle className="hot" cx={cx} cy={cy} r={2.5} fill="currentColor" />
+
+      {[0, 1.7].map((delay: number) => (
+        <circle
+          key={delay}
+          className="ripple"
+          cx={50}
+          cy={50}
+          r={35}
+          fill="none"
+          stroke="#d9bcff"
+          strokeWidth={1.4}
+          style={{ animationDelay: `${delay}s` }}
+        />
+      ))}
+
+      <g className="pupil">
+        <circle cx={50} cy={50} r={7} fill="#14062c" />
+        <circle
+          cx={50}
+          cy={50}
+          r={7}
+          fill="none"
+          stroke="#e3c8ff"
+          strokeWidth={1.2}
+          opacity={0.75}
+        />
+      </g>
+
+      <Highlight />
     </g>
   );
 };
