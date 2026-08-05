@@ -1,7 +1,27 @@
 import {Problem} from '../models/Problem';
 import {ProblemStatistics} from '../models/ProblemStatistics';
 
-const STORAGE_PREFIX = 'cfppu.';
+// Bump the version whenever a saved shape changes, so an old browser cache
+// can never feed outdated data into a newer screen.
+const STORAGE_NAMESPACE = 'cfppu.';
+const STORAGE_VERSION = 'v1';
+const STORAGE_PREFIX = `${STORAGE_NAMESPACE}${STORAGE_VERSION}.`;
+
+export function dropOutdatedState(): void {
+  try {
+    const stale: string[] = [];
+    for (let index = 0; index < localStorage.length; index++) {
+      const key: string | null = localStorage.key(index);
+      if (key === null) continue;
+      if (key.indexOf(STORAGE_NAMESPACE) !== 0) continue;
+      if (key.indexOf(STORAGE_PREFIX) === 0) continue;
+      stale.push(key);
+    }
+    stale.forEach((key: string) => localStorage.removeItem(key));
+  } catch {
+    // Storage can be unavailable. Nothing to clean up in that case.
+  }
+}
 
 export function getPromblemsListFromStorage(): Array<{
   problem: Problem;
@@ -43,7 +63,11 @@ export function loadState<T>(key: string, fallback: T): T {
   try {
     const raw: string | null = localStorage.getItem(STORAGE_PREFIX + key);
     if (raw === null) return fallback;
-    return JSON.parse(raw) as T;
+
+    const parsed: T = JSON.parse(raw) as T;
+    // a stored null would slip past the callers' revivers and break rendering
+    if (parsed === null || parsed === undefined) return fallback;
+    return parsed;
   } catch {
     return fallback;
   }

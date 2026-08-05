@@ -686,6 +686,18 @@ const LoadingNote = styled.div`
   background-color: rgba(34, 211, 238, 0.07);
 `;
 
+function nextManualGroupNumber(groups: ProblemGroup[]): number {
+  const highest: number = groups.reduce(
+    (largest: number, group: ProblemGroup) => {
+      const match: RegExpExecArray | null = /^manual-(\d+)$/.exec(group.id);
+      return match ? Math.max(largest, Number(match[1])) : largest;
+    },
+    0,
+  );
+
+  return highest + 1;
+}
+
 const ProblemCheck: React.FC<Props> = (props: Props): ReactElement => {
   const [handlesInput, setHandlesInput] = usePersistentState<string>(
     "crossAnalysis.handlesInput",
@@ -707,12 +719,11 @@ const ProblemCheck: React.FC<Props> = (props: Props): ReactElement => {
     "crossAnalysis.groups",
     [],
   );
-  const manualGroupSeq = useRef<number>(
-    groups.reduce((largest: number, group: ProblemGroup) => {
-      const match: RegExpExecArray | null = /^manual-(\d+)$/.exec(group.id);
-      return match ? Math.max(largest, Number(match[1])) : largest;
-    }, 0) + 1,
-  );
+  // seeded once from restored groups, so a reloaded page never reuses an id
+  const manualGroupSeq = useRef<number>(0);
+  if (manualGroupSeq.current === 0) {
+    manualGroupSeq.current = nextManualGroupNumber(groups);
+  }
   const [hiddenHandles, setHiddenHandles] = usePersistentState<Flags>(
     "crossAnalysis.hiddenHandles",
     {},
