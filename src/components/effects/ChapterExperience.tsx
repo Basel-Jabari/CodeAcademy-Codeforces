@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode } from "react";
-import styled, { css, keyframes } from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { AppTab } from "../navigation/ServiceNavigation";
 import { MangaEyes } from "./MangaEyes";
 
@@ -11,60 +11,43 @@ interface StageProps extends ChapterProps {
   children: ReactNode;
 }
 
-
-
-
 const rise = keyframes`
-  0% { transform: translate3d(0, 10vh, 0) scale(.35); opacity: 0; }
-  15% { opacity: .9; }
-  80% { opacity: .4; }
-  100% { transform: translate3d(var(--drift), -105vh, 0) scale(1); opacity: 0; }
+  0% { transform: translate3d(0, 12vh, 0) scale(.3); opacity: 0; }
+  12% { opacity: .95; }
+  78% { opacity: .35; }
+  100% { transform: translate3d(var(--drift), -110vh, 0) scale(1.1); opacity: 0; }
 `;
 
 const flameBreathe = keyframes`
-  0%, 100% { transform: translateY(12px) scaleX(1); opacity: .42; }
-  50% { transform: translateY(-5px) scaleX(1.08); opacity: .72; }
+  0%, 100% { transform: translateY(10px) scaleX(1); opacity: .4; }
+  50% { transform: translateY(-8px) scaleX(1.06); opacity: .78; }
 `;
 
-const current = keyframes`
-  from { transform: translate3d(-8%, 0, 0) rotate(-1deg); }
-  to { transform: translate3d(8%, -8px, 0) rotate(1deg); }
+const waveSlide = keyframes`
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 `;
 
-const bubbleRise = keyframes`
-  0% { transform: translateY(18vh) scale(.5); opacity: 0; }
-  18% { opacity: .45; }
-  100% { transform: translateY(-105vh) scale(1.25); opacity: 0; }
+const waveBob = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 `;
 
 const lightning = keyframes`
-  0%, 9%, 14%, 72%, 100% { opacity: 0; stroke-dashoffset: 520; }
-  10%, 13% { opacity: .9; stroke-dashoffset: 0; }
-  73% { opacity: .55; stroke-dashoffset: 0; }
-  76% { opacity: 0; }
+  0%, 8%, 13%, 70%, 100% { opacity: 0; stroke-dashoffset: 640; }
+  9%, 12% { opacity: .95; stroke-dashoffset: 0; }
+  71% { opacity: .5; stroke-dashoffset: 0; }
+  74% { opacity: 0; }
 `;
 
 const haze = keyframes`
-  0%, 100% { transform: translate3d(-3%, 2%, 0) scale(1); }
-  50% { transform: translate3d(4%, -3%, 0) scale(1.12); }
+  0%, 100% { transform: translate3d(-2%, 1%, 0) scale(1); }
+  50% { transform: translate3d(3%, -2%, 0) scale(1.08); }
 `;
 
 const revealContent = keyframes`
-  0% { opacity: 0; transform: translateY(14px) scale(.992); filter: blur(5px); }
-  42% { opacity: 0; }
-  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-`;
-
-const curtain = keyframes`
-  0% { clip-path: inset(0 0 0 0); opacity: 1; }
-  38% { clip-path: inset(0 0 0 0); opacity: 1; }
-  100% { clip-path: inset(0 0 0 100%); opacity: 0; }
-`;
-
-const slash = keyframes`
-  0% { left: -12%; opacity: 0; }
-  30% { opacity: 1; }
-  100% { left: 112%; opacity: 0; }
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
 `;
 
 const Backdrop = styled.div`
@@ -77,70 +60,89 @@ const Backdrop = styled.div`
 
 const Ambient = styled.div<{ $kind: AppTab }>`
   position: absolute;
-  inset: -12%;
+  inset: -10%;
   background: ${(props) =>
     props.$kind === "randomizer"
-      ? "radial-gradient(circle at 18% 78%, rgba(237,36,71,.18), transparent 28%), radial-gradient(circle at 78% 12%, rgba(255,106,88,.12), transparent 25%)"
+      ? "radial-gradient(circle at 15% 85%, rgba(237,36,71,.22), transparent 32%), radial-gradient(circle at 80% 8%, rgba(255,106,88,.12), transparent 28%), radial-gradient(circle at 50% 40%, rgba(110,11,32,.1), transparent 50%)"
       : props.$kind === "crossAnalysis"
-      ? "radial-gradient(ellipse at 50% 115%, rgba(32,167,245,.24), transparent 44%), radial-gradient(circle at 84% 10%, rgba(41,230,211,.12), transparent 26%)"
-      : "radial-gradient(circle at 50% 56%, rgba(146,92,255,.18), transparent 42%), radial-gradient(circle at 82% 8%, rgba(224,124,255,.10), transparent 25%)"};
-  animation: ${haze} 15s ease-in-out infinite;
+      ? "radial-gradient(ellipse at 50% 120%, rgba(14,116,144,.32), transparent 48%), radial-gradient(circle at 12% 20%, rgba(8,145,178,.14), transparent 30%), radial-gradient(circle at 88% 10%, rgba(34,211,238,.1), transparent 26%)"
+      : "radial-gradient(circle at 50% 55%, rgba(146,92,255,.2), transparent 44%), radial-gradient(circle at 80% 8%, rgba(224,124,255,.1), transparent 26%), radial-gradient(circle at 15% 80%, rgba(67,32,124,.14), transparent 34%)"};
+  animation: ${haze} 18s ease-in-out infinite;
 `;
 
 const FireBed = styled.div`
   position: absolute;
-  right: -5%;
-  bottom: -90px;
-  left: -5%;
-  height: 260px;
-  opacity: .62;
-  background: repeating-radial-gradient(ellipse at 50% 105%, transparent 0 32px, rgba(237, 36, 71, .19) 34px, rgba(255, 139, 63, .08) 45px, transparent 65px);
-  filter: blur(10px) saturate(1.3);
-  animation: ${flameBreathe} 3.2s ease-in-out infinite;
+  right: -6%;
+  bottom: -100px;
+  left: -6%;
+  height: 42vh;
+  min-height: 220px;
+  opacity: 0.7;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 100%, rgba(237, 36, 71, 0.35), transparent 55%),
+    radial-gradient(ellipse 70% 55% at 55% 110%, rgba(255, 106, 88, 0.28), transparent 50%),
+    radial-gradient(ellipse 60% 50% at 85% 100%, rgba(255, 154, 82, 0.22), transparent 48%);
+  filter: blur(8px) saturate(1.25);
+  animation: ${flameBreathe} 3.4s ease-in-out infinite;
 `;
 
 const Spark = styled.i`
   position: absolute;
-  bottom: -20px;
+  bottom: -24px;
   left: var(--left);
   width: var(--size);
-  height: calc(var(--size) * 2.8);
+  height: calc(var(--size) * 3.2);
   border-radius: 999px;
   background: linear-gradient(to top, #ed2447, #ff9a52);
-  box-shadow: 0 0 10px #ed2447, 0 0 18px rgba(255, 154, 82, .45);
+  box-shadow: 0 0 12px #ed2447, 0 0 22px rgba(255, 154, 82, 0.45);
   animation: ${rise} var(--duration) linear var(--delay) infinite;
 `;
 
-const Water = styled.div`
+const SeaFloor = styled.div`
   position: absolute;
-  right: -12%;
-  bottom: -80px;
-  left: -12%;
-  height: 300px;
-  opacity: .38;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: min(48vh, 420px);
+  overflow: hidden;
 `;
 
-const Wave = styled.i`
+const WaveLayer = styled.div<{ $delay: string; $opacity: number; $duration: string }>`
   position: absolute;
-  inset: var(--inset);
-  border: 2px solid rgba(117, 220, 255, .42);
-  border-right-color: rgba(41, 230, 211, .18);
-  border-left-color: transparent;
-  border-radius: 48% 52% 0 0 / 22% 25% 0 0;
-  filter: drop-shadow(0 0 15px rgba(32, 167, 245, .32));
-  animation: ${current} var(--duration) ease-in-out var(--delay) infinite alternate;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  opacity: ${(props) => props.$opacity};
+  animation: ${waveSlide} ${(props) => props.$duration} linear infinite;
+  animation-delay: ${(props) => props.$delay};
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  path {
+    fill: currentColor;
+  }
 `;
 
-const Bubble = styled.i`
+const WaveBob = styled.div`
   position: absolute;
-  bottom: -20px;
-  left: var(--left);
-  width: var(--size);
-  height: var(--size);
-  border: 1px solid rgba(117, 220, 255, .6);
-  border-radius: 50%;
-  box-shadow: inset 2px 2px 5px rgba(41, 230, 211, .2), 0 0 8px rgba(32, 167, 245, .2);
-  animation: ${bubbleRise} var(--duration) ease-in var(--delay) infinite;
+  inset: 0;
+  color: rgba(14, 116, 144, 0.55);
+  animation: ${waveBob} 5.5s ease-in-out infinite;
+
+  &:nth-child(2) {
+    color: rgba(8, 145, 178, 0.4);
+    animation-delay: -1.8s;
+  }
+
+  &:nth-child(3) {
+    color: rgba(34, 211, 238, 0.28);
+    animation-delay: -3.2s;
+  }
 `;
 
 const LightningSvg = styled.svg`
@@ -149,42 +151,41 @@ const LightningSvg = styled.svg`
   width: 100%;
   height: 100%;
   color: var(--cf-accent-bright);
-  opacity: .48;
+  opacity: 0.55;
 
   path {
     fill: none;
     stroke: currentColor;
-    stroke-width: 1.3;
+    stroke-width: 1.4;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-dasharray: 520;
-    filter: drop-shadow(0 0 7px var(--cf-glow));
-    animation: ${lightning} 7s ease-in-out infinite;
+    stroke-dasharray: 640;
+    filter: drop-shadow(0 0 8px var(--cf-glow));
+    animation: ${lightning} 6.5s ease-in-out infinite;
   }
 
-  path:nth-child(2) { animation-delay: -2.6s; opacity: .65; }
-  path:nth-child(3) { animation-delay: -4.8s; opacity: .38; }
-`;
-
-const Watermark = styled.div`
-  position: absolute;
-  top: 106px;
-  right: max(2vw, 18px);
-  width: min(42vw, 560px);
-  opacity: 0.11;
-
-  @media screen and (max-width: 760px) {
-    top: 148px;
-    right: -110px;
-    width: 390px;
-    opacity: 0.07;
+  path:nth-child(2) {
+    animation-delay: -2.2s;
+    opacity: 0.7;
+  }
+  path:nth-child(3) {
+    animation-delay: -4.1s;
+    opacity: 0.45;
+  }
+  path:nth-child(4) {
+    animation-delay: -1.1s;
+    opacity: 0.35;
   }
 `;
 
-const sparks = Array.from({ length: 25 }, (_, index: number) => index);
-const bubbles = Array.from({ length: 18 }, (_, index: number) => index);
+const sparks = Array.from({ length: 32 }, (_, index: number) => index);
 
-export const ChapterAtmosphere: React.FC<ChapterProps> = ({ kind }): ReactElement => (
+const wavePath =
+  "M0,180 C120,120 240,240 360,180 C480,120 600,240 720,180 C840,120 960,240 1080,180 C1200,120 1320,240 1440,180 L1440,420 L0,420 Z";
+
+export const ChapterAtmosphere: React.FC<ChapterProps> = ({
+  kind,
+}): ReactElement => (
   <Backdrop aria-hidden="true">
     <Ambient $kind={kind} />
     {kind === "randomizer" ? (
@@ -193,49 +194,67 @@ export const ChapterAtmosphere: React.FC<ChapterProps> = ({ kind }): ReactElemen
         {sparks.map((spark: number) => (
           <Spark
             key={spark}
-            style={{
-              "--left": `${(spark * 37) % 101}%`,
-              "--size": `${2 + (spark % 4)}px`,
-              "--duration": `${5 + (spark % 7) * 0.7}s`,
-              "--delay": `${-(spark % 9) * 0.8}s`,
-              "--drift": `${(spark % 2 ? 1 : -1) * (20 + (spark % 5) * 13)}px`,
-            } as React.CSSProperties}
+            style={
+              {
+                "--left": `${(spark * 31) % 101}%`,
+                "--size": `${2 + (spark % 5)}px`,
+                "--duration": `${4.5 + (spark % 8) * 0.65}s`,
+                "--delay": `${-(spark % 11) * 0.7}s`,
+                "--drift": `${(spark % 2 ? 1 : -1) * (18 + (spark % 6) * 12)}px`,
+              } as React.CSSProperties
+            }
           />
         ))}
       </>
     ) : null}
     {kind === "crossAnalysis" ? (
-      <>
-        <Water>
-          <Wave style={{ "--inset": "12% 0 0", "--duration": "7s", "--delay": "-2s" } as React.CSSProperties} />
-          <Wave style={{ "--inset": "30% -7% 0", "--duration": "9s", "--delay": "-5s" } as React.CSSProperties} />
-          <Wave style={{ "--inset": "49% -3% 0", "--duration": "11s", "--delay": "-1s" } as React.CSSProperties} />
-        </Water>
-        {bubbles.map((bubble: number) => (
-          <Bubble
-            key={bubble}
-            style={{
-              "--left": `${(bubble * 43) % 97}%`,
-              "--size": `${4 + (bubble % 5) * 3}px`,
-              "--duration": `${8 + (bubble % 6)}s`,
-              "--delay": `${-(bubble % 8) * 1.25}s`,
-            } as React.CSSProperties}
-          />
-        ))}
-      </>
+      <SeaFloor>
+        <WaveBob>
+          <WaveLayer $delay="0s" $opacity={1} $duration="18s">
+            <svg viewBox="0 0 1440 420" preserveAspectRatio="none">
+              <path d={wavePath} />
+              <path d={wavePath} transform="translate(1440,0)" />
+            </svg>
+          </WaveLayer>
+        </WaveBob>
+        <WaveBob>
+          <WaveLayer $delay="-4s" $opacity={1} $duration="14s">
+            <svg viewBox="0 0 1440 420" preserveAspectRatio="none">
+              <path d="M0,220 C150,160 300,280 450,210 C600,140 750,270 900,200 C1050,140 1200,260 1440,200 L1440,420 L0,420 Z" />
+              <path
+                d="M0,220 C150,160 300,280 450,210 C600,140 750,270 900,200 C1050,140 1200,260 1440,200 L1440,420 L0,420 Z"
+                transform="translate(1440,0)"
+              />
+            </svg>
+          </WaveLayer>
+        </WaveBob>
+        <WaveBob>
+          <WaveLayer $delay="-8s" $opacity={1} $duration="11s">
+            <svg viewBox="0 0 1440 420" preserveAspectRatio="none">
+              <path d="M0,260 C180,210 360,310 540,250 C720,190 900,300 1080,240 C1260,190 1380,280 1440,250 L1440,420 L0,420 Z" />
+              <path
+                d="M0,260 C180,210 360,310 540,250 C720,190 900,300 1080,240 C1260,190 1380,280 1440,250 L1440,420 L0,420 Z"
+                transform="translate(1440,0)"
+              />
+            </svg>
+          </WaveLayer>
+        </WaveBob>
+      </SeaFloor>
     ) : null}
     {kind === "contestBuilder" ? (
       <LightningSvg viewBox="0 0 1440 900" preserveAspectRatio="none">
-        <path d="M1260 -10 L1188 122 L1225 148 L1132 278 L1163 304 L1060 468 L1097 490 L998 650" />
-        <path d="M170 -20 L239 114 L205 148 L302 285 L265 318 L382 455" />
-        <path d="M840 -10 L803 91 L834 121 L763 226 L788 249 L719 360" />
+        <path d="M1280 -20 L1195 130 L1240 155 L1130 300 L1170 330 L1055 500 L1095 525 L980 700" />
+        <path d="M160 -30 L235 120 L200 155 L310 300 L270 340 L400 500 L360 540 L470 700" />
+        <path d="M820 -10 L780 100 L815 130 L740 250 L775 275 L690 400 L720 430 L640 560" />
+        <path d="M520 40 L490 140 L520 165 L455 280 L485 305 L410 430" />
       </LightningSvg>
     ) : null}
-    <Watermark><MangaEyes kind={kind} /></Watermark>
   </Backdrop>
 );
 
-const chapterCopy: { [key in AppTab]: { eyebrow: string; title: string; note: string } } = {
+const chapterCopy: {
+  [key in AppTab]: { eyebrow: string; title: string; note: string };
+} = {
   randomizer: {
     eyebrow: "Chapter I · Crimson instinct",
     title: "Walk into the fire",
@@ -253,39 +272,37 @@ const chapterCopy: { [key in AppTab]: { eyebrow: string; title: string; note: st
   },
 };
 
-const Banner = styled.section<{ $kind: AppTab }>`
+const Banner = styled.section`
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) minmax(280px, 470px);
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
   width: calc(100% - 48px);
   max-width: 1120px;
-  min-height: 104px;
+  min-height: 96px;
   margin: 0 auto 18px;
-  padding: 15px 22px 15px 25px;
+  padding: 16px 22px;
   box-sizing: border-box;
   overflow: hidden;
-  background: ${(props) =>
-    props.$kind === "randomizer"
-      ? "linear-gradient(105deg, rgba(33,9,14,.94), rgba(8,5,6,.76) 68%)"
-      : props.$kind === "crossAnalysis"
-      ? "linear-gradient(105deg, rgba(5,27,42,.94), rgba(4,8,13,.76) 68%)"
-      : "linear-gradient(105deg, rgba(25,13,42,.94), rgba(7,5,12,.76) 68%)"};
+  background-image: linear-gradient(
+    135deg,
+    var(--cf-glow-soft),
+    rgba(7, 5, 12, 0.88) 55%,
+    rgba(7, 5, 12, 0.82)
+  );
   border: 1px solid var(--cf-border);
-  border-left: 3px solid var(--cf-accent);
-  border-radius: ${(props) =>
-    props.$kind === "randomizer" ? "3px 22px 22px 3px" : props.$kind === "crossAnalysis" ? "26px 8px 26px 8px" : "6px 25px 6px 25px"};
-  box-shadow: 0 22px 60px rgba(0, 0, 0, .4), 0 0 32px var(--cf-glow-soft);
-  backdrop-filter: blur(13px);
+  border-radius: 8px 28px 8px 28px;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.4), 0 0 28px var(--cf-glow-soft);
+  backdrop-filter: blur(14px);
 
   &::before {
     content: "";
     position: absolute;
     left: 0;
     bottom: 0;
-    width: 42%;
+    width: 40%;
     height: 1px;
     background: linear-gradient(90deg, var(--cf-accent-bright), transparent);
     box-shadow: 0 0 12px var(--cf-glow);
@@ -293,90 +310,75 @@ const Banner = styled.section<{ $kind: AppTab }>`
 
   @media screen and (max-width: 720px) {
     width: calc(100% - 24px);
-    grid-template-columns: 1fr;
-    min-height: 92px;
-    padding: 14px 18px;
+    grid-template-columns: 1fr auto;
+    min-height: 84px;
+    padding: 14px 16px;
   }
 `;
 
 const Copy = styled.div`
   position: relative;
   z-index: 2;
+  min-width: 0;
 `;
 
 const Eyebrow = styled.div`
   color: var(--cf-accent-bright);
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 2.5px;
+  letter-spacing: 2.4px;
   text-transform: uppercase;
 `;
 
 const BannerTitle = styled.div`
-  margin-top: 3px;
+  margin-top: 4px;
   color: var(--cf-text);
-  font-size: clamp(19px, 2vw, 26px);
+  font-size: clamp(18px, 2vw, 25px);
   font-weight: 700;
-  letter-spacing: .2px;
-  text-shadow: 0 0 20px var(--cf-glow-soft);
+  letter-spacing: 0.2px;
+  text-shadow: 0 0 18px var(--cf-glow-soft);
 `;
 
 const Note = styled.div`
-  max-width: 440px;
-  margin-top: 3px;
+  max-width: 460px;
+  margin-top: 4px;
   color: var(--cf-text-muted);
   font-size: 11px;
   line-height: 1.5;
 `;
 
-const BannerEyes = styled.div`
-  width: 100%;
-  max-width: 460px;
-  justify-self: end;
-  opacity: 0.95;
+const EyeSlot = styled.div`
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  width: 88px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   @media screen and (max-width: 720px) {
-    position: absolute;
-    right: -80px;
-    width: 390px;
-    opacity: 0.14;
+    width: 64px;
+    height: 64px;
   }
 `;
 
-export const ChapterBanner: React.FC<ChapterProps> = ({ kind }): ReactElement => (
-  <Banner $kind={kind}>
+export const ChapterBanner: React.FC<ChapterProps> = ({
+  kind,
+}): ReactElement => (
+  <Banner>
     <Copy>
       <Eyebrow>{chapterCopy[kind].eyebrow}</Eyebrow>
       <BannerTitle>{chapterCopy[kind].title}</BannerTitle>
       <Note>{chapterCopy[kind].note}</Note>
     </Copy>
-    <BannerEyes><MangaEyes kind={kind} /></BannerEyes>
+    <EyeSlot>
+      <MangaEyes kind={kind} size={88} />
+    </EyeSlot>
   </Banner>
 );
 
-const stageShape = (kind: AppTab) => {
-  if (kind === "randomizer") {
-    return css`
-      border-radius: 4px 30px 8px 4px;
-      border-left: 2px solid var(--cf-accent);
-      background: linear-gradient(120deg, var(--cf-glow-soft), transparent 38%);
-    `;
-  }
-  if (kind === "crossAnalysis") {
-    return css`
-      border-radius: 34px 12px 34px 12px;
-      border-top: 1px solid var(--cf-border-bright);
-      background: radial-gradient(ellipse at 50% 120%, var(--cf-glow-soft), transparent 58%);
-    `;
-  }
-  return css`
-    border-radius: 8px 28px 8px 28px;
-    border: 1px solid var(--cf-border);
-    background: linear-gradient(145deg, var(--cf-glow-soft), transparent 30%, var(--cf-glow-soft));
-  `;
-};
-
-const Stage = styled.div<{ $kind: AppTab }>`
+const Stage = styled.div`
   position: relative;
   width: 100%;
   max-width: 1180px;
@@ -384,49 +386,34 @@ const Stage = styled.div<{ $kind: AppTab }>`
   padding: 18px;
   box-sizing: border-box;
   isolation: isolate;
-  ${props => stageShape(props.$kind)}
+  border-radius: 8px 28px 8px 28px;
+  border: 1px solid var(--cf-border);
+  background: linear-gradient(
+    145deg,
+    var(--cf-glow-soft),
+    transparent 32%,
+    var(--cf-glow-soft)
+  );
 
   > * {
-    animation: ${revealContent} 760ms cubic-bezier(.22, .84, .31, 1) both;
-  }
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -2px;
-    z-index: 8;
-    pointer-events: none;
-    background: linear-gradient(110deg, var(--cf-accent-deep), var(--cf-accent), var(--cf-bg) 76%);
-    border-radius: inherit;
-    animation: ${curtain} 760ms cubic-bezier(.72, 0, .18, 1) both;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    z-index: 9;
-    top: -4%;
-    left: -12%;
-    width: 2px;
-    height: 108%;
-    pointer-events: none;
-    background: #fff;
-    box-shadow: 0 0 10px #fff, 0 0 24px var(--cf-accent), 0 0 52px var(--cf-glow);
-    transform: skewX(-12deg);
-    animation: ${slash} 780ms cubic-bezier(.7, 0, .2, 1) both;
+    animation: ${revealContent} 520ms ease both;
   }
 
   @media screen and (max-width: 620px) {
     padding: 10px;
-    border-radius: 10px 20px 10px 20px;
+    border-radius: 8px 20px 8px 20px;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    > *, &::before, &::after { animation: none; }
-    &::before, &::after { display: none; }
+    > * {
+      animation: none;
+    }
   }
 `;
 
-export const ChapterStage: React.FC<StageProps> = ({ kind, children }): ReactElement => (
-  <Stage $kind={kind} data-chapter={kind}>{children}</Stage>
+export const ChapterStage: React.FC<StageProps> = ({
+  kind,
+  children,
+}): ReactElement => (
+  <Stage data-chapter={kind}>{children}</Stage>
 );

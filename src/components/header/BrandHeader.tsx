@@ -18,34 +18,11 @@ const Brand = styled.div`
   grid-template-columns: auto auto auto;
   align-items: center;
   gap: 22px;
-  padding: 10px 29px;
-
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    width: 24px;
-    height: 34px;
-    border-top: 1px solid var(--cf-accent);
-    border-bottom: 1px solid var(--cf-accent);
-    opacity: 0.72;
-    transform: translateY(-50%) skewX(-18deg);
-  }
-
-  &::before {
-    left: 0;
-    border-left: 2px solid var(--cf-accent);
-  }
-
-  &::after {
-    right: 0;
-    border-right: 2px solid var(--cf-accent);
-  }
+  padding: 10px 18px;
 
   @media screen and (max-width: 560px) {
     gap: 12px;
-    padding: 8px 18px;
+    padding: 8px 10px;
   }
 `;
 
@@ -95,7 +72,6 @@ const Cross = styled.span`
   font-weight: 300;
   line-height: 1;
   text-shadow: 0 0 14px var(--cf-glow);
-  transform: rotate(45deg);
 `;
 
 const AllianceLabel = styled.span`
@@ -125,7 +101,7 @@ const BrandHeader: React.FC = (): ReactElement => (
         <Logo src={assets.images.codeforcesIcon} alt="Codeforces" />
       </LogoLink>
       <Alliance aria-label="Codeforces and Palestine Polytechnic University">
-        <Cross>+</Cross>
+        <Cross>×</Cross>
         <AllianceLabel>Code Academy</AllianceLabel>
       </Alliance>
       <LogoLink
@@ -134,7 +110,10 @@ const BrandHeader: React.FC = (): ReactElement => (
         rel="noopener noreferrer"
         title="Palestine Polytechnic University"
       >
-        <Logo src={assets.images.ppuccIcon} alt="Palestine Polytechnic University" />
+        <Logo
+          src={assets.images.ppuccIcon}
+          alt="Palestine Polytechnic University"
+        />
       </LogoLink>
     </Brand>
   </HeaderShell>
