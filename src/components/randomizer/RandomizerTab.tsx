@@ -4,21 +4,20 @@ import { Problem } from "../../models/Problem";
 import { ProblemStatistics } from "../../models/ProblemStatistics";
 import { TagNode } from "../../models/TagExpression";
 import ProblemsSection from "../problems-section/ProblemsSection";
-import { getRandomProblems } from "../../services/problems";
-import { getProblemKey, parseHandles } from "../../services/submissions";
+import { getRandomProblem } from "../../services/problems";
+import { parseHandles } from "../../services/submissions";
 import {
   createDefaultExpression,
   regenerateNodeIds,
 } from "../../services/tagExpression";
 import {
-  clearProblemsList,
   setProblemsListToStorage,
+  clearProblemsList,
 } from "../../services/storage";
 import { usePersistentState } from "../../services/persistentState";
 import ClearButton from "../clear-button/ClearButton";
 import Options from "../options/Options";
 import ExpressionBuilder from "../expression/ExpressionBuilder";
-import ResetTabButton from "../common/ResetTabButton";
 import theme from "../../theme";
 
 interface Props {
@@ -27,7 +26,6 @@ interface Props {
     problemStatistics: ProblemStatistics;
   }>;
   onError: (message: string) => void;
-  onReset: () => void;
 }
 
 const Pane = styled.div`
@@ -36,11 +34,12 @@ const Pane = styled.div`
   gap: 16px;
   min-width: 0;
   width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
 `;
 
 const PaneHead = styled.div`
   display: flex;
-  flex-wrap: wrap;
   align-items: baseline;
   gap: 10px;
   padding-bottom: 8px;
@@ -89,54 +88,23 @@ const RandomizerTab: React.FC<Props> = (props: Props): ReactElement => {
     "randomizer.participantHandles",
     "",
   );
-  const [problemCount, setProblemCount] = usePersistentState<number>(
-    "randomizer.problemCount",
-    1,
-    (stored: number) => {
-      const value: number = Math.floor(Number(stored));
-      if (!Number.isFinite(value) || value < 1) return 1;
-      return Math.min(50, value);
-    },
-  );
   const [problemsList, setProblemsList] = useState<
     Array<{ problem: Problem; problemStatistics: ProblemStatistics }>
   >(props.initialProblemsList);
 
-  const randomizeProblems: (ratings: {
+  const randomizeProblem: (ratings: {
     min: number;
     max: number;
   }) => void = async (ratings: { min: number; max: number }): Promise<void> => {
-    const wanted: number = Math.max(1, Math.min(50, Math.floor(problemCount) || 1));
-    const excludeKeys: Set<string> = new Set(
-      problemsList.map((entry) =>
-        getProblemKey(entry.problem.contestId, entry.problem.index),
-      ),
-    );
-
     try {
-      const result = await getRandomProblems(
+      const newProblem = await getRandomProblem(
         expression,
         ratings,
         parseHandles(participantHandles),
-        wanted,
-        excludeKeys,
       );
-
-      if (result.picked.length === 0) {
-        props.onError(
-          result.failureReason ||
-            "No matching problems left that are not already in your list.",
-        );
-        return;
-      }
-
-      const newProblemsList = problemsList.concat(result.picked);
+      const newProblemsList = problemsList.concat(newProblem);
       setProblemsListToStorage(newProblemsList);
       setProblemsList(newProblemsList);
-
-      if (result.failureReason) {
-        props.onError(result.failureReason);
-      }
     } catch (e) {
       props.onError(e.message);
     }
@@ -152,9 +120,8 @@ const RandomizerTab: React.FC<Props> = (props: Props): ReactElement => {
       <PaneHead>
         <PaneTitle>Problem Randomizer</PaneTitle>
         <PaneSubtitle>
-          Build a tag expression, then pull one or more distinct problems
+          Build a tag expression, then pull a problem
         </PaneSubtitle>
-        <ResetTabButton onClick={props.onReset}></ResetTabButton>
       </PaneHead>
 
       <ExpressionBuilder
@@ -165,9 +132,7 @@ const RandomizerTab: React.FC<Props> = (props: Props): ReactElement => {
       <Options
         participantHandles={participantHandles}
         onParticipantHandlesChange={setParticipantHandles}
-        problemCount={problemCount}
-        onProblemCountChange={setProblemCount}
-        onRandomize={randomizeProblems}
+        onRandomize={randomizeProblem}
         onError={props.onError}
       ></Options>
 

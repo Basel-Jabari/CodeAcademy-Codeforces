@@ -70,16 +70,10 @@ function collectCandidateIndices(
   ratings: { min: number; max: number },
   acceptedProblemKeys: Set<string>,
   excludeProblemKeys: Set<string>,
-): {
-  candidates: number[];
-  matchedTags: number;
-  excludedAsSolved: number;
-  excludedAlreadyUsed: number;
-} {
+): { candidates: number[]; matchedTags: number; excludedAsSolved: number } {
   const candidates: number[] = [];
   let matchedTags: number = 0;
   let excludedAsSolved: number = 0;
-  let excludedAlreadyUsed: number = 0;
 
   problemset.problems.forEach((problem: Problem, index: number) => {
     if (!problem.rating) problem.rating = ratings.min;
@@ -90,10 +84,7 @@ function collectCandidateIndices(
     if (problem.rating < ratings.min || problem.rating > ratings.max) return;
 
     const key: string = getProblemKey(problem.contestId, problem.index);
-    if (excludeProblemKeys.has(key)) {
-      excludedAlreadyUsed++;
-      return;
-    }
+    if (excludeProblemKeys.has(key)) return;
 
     if (acceptedProblemKeys.has(key)) {
       excludedAsSolved++;
@@ -103,22 +94,16 @@ function collectCandidateIndices(
     candidates.push(index);
   });
 
-  return { candidates, matchedTags, excludedAsSolved, excludedAlreadyUsed };
+  return { candidates, matchedTags, excludedAsSolved };
 }
 
 function emptyReason(
   matchedTags: number,
   excludedAsSolved: number,
-  excludedAlreadyUsed: number,
   ratings: { min: number; max: number },
 ): string {
-  if (excludedAlreadyUsed > 0 && excludedAsSolved === 0) {
-    return `No new matching problems left — ${excludedAlreadyUsed} already ${
-      excludedAlreadyUsed === 1 ? "is" : "are"
-    } in your list (or this contest). Clear the list or loosen the filters.`;
-  }
-  if (excludedAsSolved > 0 || excludedAlreadyUsed > 0) {
-    return `All matching problems were already solved by the entered handles, or are already in your list. Try another combination.`;
+  if (excludedAsSolved > 0) {
+    return `All ${excludedAsSolved} matching problems were already solved by the entered handles (or already used in this contest). Try another combination.`;
   }
   if (matchedTags > 0) {
     return `${matchedTags} problems match the tags, but none is rated ${ratings.min}–${ratings.max} (after exclusions). Widen the rating range.`;
@@ -141,19 +126,16 @@ export async function getRandomProblem(
     participantHandles,
   );
 
-  const { candidates, matchedTags, excludedAsSolved, excludedAlreadyUsed } =
-    collectCandidateIndices(
-      problemset,
-      filter,
-      ratings,
-      acceptedProblemKeys,
-      excludeProblemKeys,
-    );
+  const { candidates, matchedTags, excludedAsSolved } = collectCandidateIndices(
+    problemset,
+    filter,
+    ratings,
+    acceptedProblemKeys,
+    excludeProblemKeys,
+  );
 
   if (candidates.length === 0) {
-    throw new Error(
-      emptyReason(matchedTags, excludedAsSolved, excludedAlreadyUsed, ratings),
-    );
+    throw new Error(emptyReason(matchedTags, excludedAsSolved, ratings));
   }
 
   const chosen: number = candidates[getRandomInt(candidates.length)];
@@ -189,7 +171,7 @@ export async function getRandomProblems(
   const picked: PickedProblem[] = [];
 
   for (let i = 0; i < wanted; i++) {
-    const { candidates, matchedTags, excludedAsSolved, excludedAlreadyUsed } =
+    const { candidates, matchedTags, excludedAsSolved } =
       collectCandidateIndices(
         problemset,
         filter,
@@ -202,17 +184,12 @@ export async function getRandomProblems(
       if (picked.length === 0) {
         return {
           picked: [],
-          failureReason: emptyReason(
-            matchedTags,
-            excludedAsSolved,
-            excludedAlreadyUsed,
-            ratings,
-          ),
+          failureReason: emptyReason(matchedTags, excludedAsSolved, ratings),
         };
       }
       return {
         picked: picked,
-        failureReason: `Only found ${picked.length} of ${wanted} matching problems.`,
+        failureReason: `Only found ${picked.length} of ${wanted} problems for this slot.`,
       };
     }
 

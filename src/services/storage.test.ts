@@ -1,9 +1,4 @@
-import {
-  clearStateByPrefix,
-  dropOutdatedState,
-  loadState,
-  saveState,
-} from "./storage";
+import { dropOutdatedState, loadState, saveState } from "./storage";
 
 describe("persistent state storage", () => {
   beforeEach(() => {
@@ -52,23 +47,5 @@ describe("persistent state storage", () => {
     expect(localStorage.getItem("cfppu.legacy")).toBeNull();
     expect(localStorage.getItem("cfppu.v1.activeTab")).toBe('"contestBuilder"');
     expect(localStorage.getItem("problemsList")).toBe('{"problemsList":[]}');
-  });
-
-  it("clears only keys under a logical prefix", () => {
-    saveState("randomizer.expression", { type: "LOOSE" });
-    saveState("randomizer.participantHandles", "tourist");
-    saveState("contestBuilder.report", "keep me");
-    saveState("activeTab", "randomizer");
-
-    clearStateByPrefix("randomizer.");
-
-    expect(localStorage.getItem("cfppu.v1.randomizer.expression")).toBeNull();
-    expect(
-      localStorage.getItem("cfppu.v1.randomizer.participantHandles"),
-    ).toBeNull();
-    expect(localStorage.getItem("cfppu.v1.contestBuilder.report")).toBe(
-      '"keep me"',
-    );
-    expect(localStorage.getItem("cfppu.v1.activeTab")).toBe('"randomizer"');
   });
 });

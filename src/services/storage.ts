@@ -72,20 +72,3 @@ export function loadState<T>(key: string, fallback: T): T {
     return fallback;
   }
 }
-
-/** Drops every persisted key that starts with the given logical prefix. */
-export function clearStateByPrefix(prefix: string): void {
-  try {
-    const fullPrefix: string = STORAGE_PREFIX + prefix;
-    const stale: string[] = [];
-    for (let index = 0; index < localStorage.length; index++) {
-      const key: string | null = localStorage.key(index);
-      if (key === null) continue;
-      if (key.indexOf(fullPrefix) !== 0) continue;
-      stale.push(key);
-    }
-    stale.forEach((key: string) => localStorage.removeItem(key));
-  } catch {
-    // Storage can be unavailable. Nothing to clear in that case.
-  }
-}
