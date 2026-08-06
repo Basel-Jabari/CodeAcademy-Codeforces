@@ -1,33 +1,39 @@
 # Technologies
 
-## Priority
-1. Works on Github Pages
-2. NextJS
-3. React (Only if there is no NextJS alternative)
+## Technology Principles
+- The application must be deployable to GitHub Pages using static export only.
+- Prefer solutions in the following order:
+    1. Static-export-compatible Next.js features
+    2. Browser-native APIs
+    3. React APIs
+    4. Third-party libraries
+- Introduce third-party libraries only when they provide a clear benefit over existing solutions.
 
-## TypeScript Guidelines
-- Always use TypeScript.
-- Never allow `any`.
-- Always end statements with semicolon.
-- Prefer type inference.
-- Prefer to use interfaces over types when possible.
+## Dependencies
+- Prefer browser-native and Next.js functionality over external packages.
+- Do not introduce a dependency for functionality that can be implemented cleanly with existing project code.
+- Every new dependency should have a clear benefit that outweighs its maintenance cost.
 
 ## Scripts
-- `app:`
-    - `app:start` — builds the app (`next build`) and starts it in production (`next start`). Only use this for production.
-    - `app:dev` — runs the app in development mode buildlessly via `tsx server.ts`. No output is written to disk.
-    - `app:deploy` — builds the app via `next build --output-path out/` and publishes the `out/` directory to GitHub Pages via `gh-pages`.
-- `code:`
-    - `code:lint` — runs ESLint and applies auto-fixes.
-    - `code:format` — runs Prettier and applies formatting.
-    - `code:prepare` — runs both `code:lint` and `code:format` before a push.
-- `deps:`
-    - `deps:install` — installs all dependencies (`npm install`).
-    - `deps:clean` — removes `node_modules` and `package-lock.json`, then re-installs.
-    - `deps:audit` — checks the health and security of all dependencies.
+Scripts are grouped by purpose using the `<category>:<action>` naming convention.
+
+### Application (`app:`)
+- `app:dev` — Starts the application in development mode using `tsx server.ts`. No production build artifacts are generated.
+- `app:start` — Builds the application (`next build`) and starts the production server (`next start`). Intended only for production builds.
+- `app:deploy` — Builds the static export and publishes the generated `out/` directory to GitHub Pages using `gh-pages`.
+
+### Code Quality (`code:`)
+- `code:lint` — Runs ESLint and automatically applies fixable issues.
+- `code:format` — Runs Prettier and formats the project.
+- `code:prepare` — Runs both `code:lint` and `code:format`. Intended to be executed before pushing changes.
+
+### Dependencies (`depend:`)
+- `depend:install` — Installs all project dependencies (`npm install`).
+- `depend:clean` — Removes `node_modules` and `package-lock.json`, then performs a clean installation.
+- `depend:audit` — Audits project dependencies for known vulnerabilities and general dependency health.
 
 > [!NOTE]
-> The `out/` directory is the static export target and is listed in `.gitignore`. It is only produced by `npm run build` (i.e. `app:start` or `app:deploy`). It is never committed to source control.
+> The `out/` directory contains the generated static export used for deployment to GitHub Pages. It is produced only during production builds and deployments (e.g. `app:start` and `app:deploy`), is ignored by Git, and must never be committed to source control.
 
 ## Linter and Formatter
 - Use ESLint and Prettier for linting and formatting.
@@ -35,10 +41,7 @@
 - Configurations should be easy to understand and modify.
 - Configurations should enforce the import order rule (see Imports section).
 
-# Architecture
-
-## File Structure
-
+## Project Structure
 ```
 .git/
 .next/
@@ -52,7 +55,7 @@ src/
     loading.tsx           (optional)
     global.css            (optional)
     <RouteName>/
-        layout.tsx
+        layout.tsx        (optional)
         page.tsx
         error.tsx         (optional)
         not-found.tsx     (optional)
@@ -60,8 +63,10 @@ src/
         global.css        (optional)
     ...
   components/             # Reusable UI components
-    <ComponentName>.tsx         # Component logic and markup
-    <ComponentName>.module.css  # Component-scoped styles (CSS Modules)
+    <ComponentName>/
+        <ComponentName>.tsx
+        <ComponentName>.module.css
+        index.ts
   utils/                  # Pure utility/helper functions (no API calls)
     <FeatureName>/
         <FeatureModule>.ts
@@ -69,7 +74,7 @@ src/
   types/                  # TypeScript type and interface definitions
     <ModelName>.ts
     ...
-  services/               # Codeforces API calls and data-fetching logic
+  services/               # External API calls and data-fetching logic
     <ServiceModule>.ts
     ...
 package.json
@@ -79,58 +84,121 @@ tsconfig.json
 .gitignore
 server.ts
 LICENSE
-conventions.md
 README.md
+conventions.md
 ```
 
-## Principles
+## Architecture Principles
 - Keep components small and focused (single responsibility).
 - Prefer composition over inheritance.
 - Avoid deep component nesting.
-- Use TypeScript for type safety.
-- Separate concerns (UI → `.tsx`, styles → `.module.css`, logic → `utils/` or `services/`).
+- Separate concerns:
+  - Files:
+    - UI → `.tsx`
+    - Logic → `.ts`
+    - Styles → `.module.css`
+  - Directories:
+    - Pages and layouts → `app/`
+    - Shared UI → `components/`
+    - Utilities → `utils/`
+    - External APIs → `services/`
+    - Shared types → `types/`
+- Keep modules cohesive and minimize cross-directory dependencies.
+- Keep shared components generic and free of feature-specific business logic.
+
+## Static Export and Deployment Constraints
+- Do not use middleware.
+- Do not use Route Handlers.
+- Do not rely on runtime servers.
+- Do not depend on request-specific rendering.
+- Pages must be prerenderable.
 
 # Code Practices
 
-## Components
-- Should be modular and reusable.
-- Should follow the single responsibility principle.
-- Should be functional components using `export default function <ComponentName>()` syntax.
-- Must have a co-located `<ComponentName>.module.css` file for all styles.
-- Never use inline styles or `styled-components`.
-- React is only permitted when there is no NextJS-native alternative (e.g. `react-range` for the dual-thumb slider).
+## General Principles
+- Prefer simple, maintainable solutions over clever implementations.
+- Prioritize readability over brevity.
+- Be consistent with existing project conventions.
+- Minimize unnecessary abstraction.
 
-## Styles
-- All styles live in a `<ComponentName>.module.css` file placed next to the component.
-- Import the CSS Module at the top of the component file: `import styles from './<ComponentName>.module.css';`.
-- Apply classes via `className={styles.className}`.
-- For dynamic class combinations use template literals or a utility like `clsx` if needed.
+## Components
+- Should be modular, reusable, and focused on a single responsibility.
+- Prefer composition over configuration.
+- Components should receive data through props rather than importing application state directly whenever practical.
+- Use functional components (`export default function ComponentName() {}`).
+- Components should be imported through their local `index.ts` barrel.
+- Barrel files (`index.ts`) should only re-export components and styles intended to be exposed.
+- Components should have a co-located `.module.css` file when styling is required.
+- Avoid inline styles except for runtime-computed values (e.g. CSS custom properties).
 - Do not use Tailwind CSS.
 - Do not use `styled-components`.
-- Do not use inline `style={{...}}` props for anything other than truly runtime-dynamic values (e.g. CSS custom properties).
+- Responsive design and cross-device compatibility are required.
+
+## State Management
+- Prefer local component state.
+- Lift state only when required.
+- Use Context sparingly.
+- Avoid global state unless multiple unrelated parts of the application require shared mutable state.
+
+## Data Fetching
+- Prefer Server Components for build-time rendering. Avoid Server Components that depend on request-specific data or dynamic rendering.
+- Client Components should fetch data only when runtime interaction requires it.
+- Centralize API communication inside `services/`, keeping components focused on presentation rather than transport details.
 
 ## Imports
-- Always organize imports in the following order:
-    1. NextJS imports (`next/...`)
-    2. React imports (`react`, `react/...`)
-    3. Third-party imports (e.g. `axios`, `react-range`)
-    4. Local imports (`@/...`)
-- Always use the NextJS `@/` path alias (not relative `../../` paths).
-- Example:
-  ```ts
-  import Image from 'next/image';
-  import Link from 'next/link';
+- Import order:
+    1. Next.js, then React
+    2. Third-party packages
+    3. Internal imports (Types and CSS)
+- Alphabetize imports within each group.
+- Always use the `@/` path alias for internal imports.
+- Avoid circular dependencies.
+- Never use relative imports (outside of barrel files).
+- Components must be imported from outside their directory only via their local `index.ts` barrel.
+- Components should use default exports.
+- Never import directly from `app/`. Shared UI belongs in `components/`.
 
-  import { useState, useRef } from 'react';
+## Testing
+- Automated testing is optional for this project.
+- Manual verification is the primary testing approach.
 
-  import { Range } from 'react-range';
+## Naming
+- Directories: kebab-case
+- Typescript Files: PascalCase
+- CSS Files: kebab-case
+- Functions: camelCase
+- Components: PascalCase
+- Interfaces: PascalCase
+- Variables: camelCase
+- Constants: UPPER_SNAKE_CASE only for true constants
+- CSS classes: camelCase
+- Routes: kebab-case
 
-  import { getProblemUrl } from '@/services/problemLink';
-  import styles from './ProblemCard.module.css';
-  ```
+## TypeScript Guidelines
+- Always use TypeScript.
+- Never use `any`; prefer `unknown` with proper narrowing.
+- Prefer type inference for local variables.
+- Explicitly type exported functions, public APIs, and complex return values.
+- Use `interface` for object shapes.
+- Use `type` for unions, intersections, and primitive aliases.
+- Prefer `readonly` when mutation is not intended.
+- Prefer immutable data structures where practical.
+- Type `catch` errors as `unknown`.
 
-## TypeScript
-- Never use `any` — prefer `unknown` with type narrowing.
-- Always type function parameters and return values explicitly when inference is insufficient.
-- Use `interface` for object shapes; use `type` only for unions, intersections, or aliasing primitives.
-- `catch` blocks must type the error as `unknown` and narrow before use.
+## Error Handling
+- Surface errors immediately during development.
+- Handle expected errors gracefully.
+- Avoid silently swallowing exceptions.
+- Display user-friendly error states instead of crashing the UI.
+
+## Performance
+- Prefer static rendering whenever possible.
+- Avoid unnecessary re-renders.
+- When used, optimize images, assets, fonts and links for static delivery.
+- Avoid premature optimization. Memoize only when there is measurable benefit.
+- Keep bundle size small by avoiding unnecessary dependencies.
+
+## Comments
+- Code should be self-explanatory whenever possible.
+- Use comments to explain *why*, not *what*.
+- Remove obsolete comments when updating code.
