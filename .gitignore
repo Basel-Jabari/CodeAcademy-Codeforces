@@ -39,3 +39,6 @@ lerna-debug.log*
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# local AI / agent notes (see hint.example.md)
+hint.md
