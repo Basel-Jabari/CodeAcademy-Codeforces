@@ -257,6 +257,10 @@ function bodyToString(node: TagNode): string {
     return `NOT ${parts[0]}`;
   }
 
+  if (node.type === "OPTIONAL" && parts.length === 1) {
+    return `OPTIONAL ${parts[0]}`;
+  }
+
   // root and AND share the same join word in the written form
   const join: string =
     isRootMode(node.type) || node.type === "AND" ? "AND" : node.type;
