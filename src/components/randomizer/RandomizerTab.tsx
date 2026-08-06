@@ -5,7 +5,7 @@ import { ProblemStatistics } from "../../models/ProblemStatistics";
 import { TagNode } from "../../models/TagExpression";
 import ProblemsSection from "../problems-section/ProblemsSection";
 import { getRandomProblem } from "../../services/problems";
-import { parseHandles } from "../../services/submissions";
+import { getProblemKey, parseHandles } from "../../services/submissions";
 import {
   createDefaultExpression,
   regenerateNodeIds,
@@ -96,11 +96,18 @@ const RandomizerTab: React.FC<Props> = (props: Props): ReactElement => {
     min: number;
     max: number;
   }) => void = async (ratings: { min: number; max: number }): Promise<void> => {
+    const excludeKeys: Set<string> = new Set(
+      problemsList.map((entry) =>
+        getProblemKey(entry.problem.contestId, entry.problem.index),
+      ),
+    );
+
     try {
       const newProblem = await getRandomProblem(
         expression,
         ratings,
         parseHandles(participantHandles),
+        excludeKeys,
       );
       const newProblemsList = problemsList.concat(newProblem);
       setProblemsListToStorage(newProblemsList);
