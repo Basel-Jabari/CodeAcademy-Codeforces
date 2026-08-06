@@ -4,8 +4,11 @@ import { Problem } from "../../../lib/models/Problem";
 import { ProblemStatistics } from "../../../lib/models/ProblemStatistics";
 import { TagNode } from "../../../lib/models/TagExpression";
 import ProblemsSection from "./ProblemsSection";
-import { getRandomProblem } from "../../../lib/problems/domain/problems";
-import { parseHandles } from "../../../lib/codeforces/domain/submissions";
+import { getRandomProblems } from "../../../lib/problems/domain/problems";
+import {
+  getProblemKey,
+  parseHandles,
+} from "../../../lib/codeforces/domain/submissions";
 import {
   createDefaultExpression,
   regenerateNodeIds,
@@ -88,23 +91,57 @@ const RandomizerTab: React.FC<Props> = (props: Props): ReactElement => {
     "randomizer.participantHandles",
     "",
   );
+  const [problemCount, setProblemCount] = usePersistentState<number>(
+    "randomizer.problemCount",
+    1,
+    (stored: number) => {
+      const value: number = Math.floor(Number(stored));
+      if (!Number.isFinite(value) || value < 1) return 1;
+      return Math.min(50, value);
+    },
+  );
   const [problemsList, setProblemsList] = useState<
     Array<{ problem: Problem; problemStatistics: ProblemStatistics }>
   >(props.initialProblemsList);
 
-  const randomizeProblem: (ratings: {
+  const randomizeProblems: (ratings: {
     min: number;
     max: number;
   }) => void = async (ratings: { min: number; max: number }): Promise<void> => {
+    const wanted: number = Math.max(
+      1,
+      Math.min(50, Math.floor(problemCount) || 1),
+    );
+    const excludeKeys: Set<string> = new Set(
+      problemsList.map((entry) =>
+        getProblemKey(entry.problem.contestId, entry.problem.index),
+      ),
+    );
+
     try {
-      const newProblem = await getRandomProblem(
+      const result = await getRandomProblems(
         expression,
         ratings,
         parseHandles(participantHandles),
+        wanted,
+        excludeKeys,
       );
-      const newProblemsList = problemsList.concat(newProblem);
+
+      if (result.picked.length === 0) {
+        props.onError(
+          result.failureReason ||
+            "No matching problems left that are not already in your list.",
+        );
+        return;
+      }
+
+      const newProblemsList = problemsList.concat(result.picked);
       setProblemsListToStorage(newProblemsList);
       setProblemsList(newProblemsList);
+
+      if (result.failureReason) {
+        props.onError(result.failureReason);
+      }
     } catch (e) {
       props.onError(e.message);
     }
@@ -120,7 +157,7 @@ const RandomizerTab: React.FC<Props> = (props: Props): ReactElement => {
       <PaneHead>
         <PaneTitle>Problem Randomizer</PaneTitle>
         <PaneSubtitle>
-          Build a tag expression, then pull a problem
+          Build a tag expression, then pull one or more problems
         </PaneSubtitle>
       </PaneHead>
 
@@ -132,7 +169,9 @@ const RandomizerTab: React.FC<Props> = (props: Props): ReactElement => {
       <Options
         participantHandles={participantHandles}
         onParticipantHandlesChange={setParticipantHandles}
-        onRandomize={randomizeProblem}
+        problemCount={problemCount}
+        onProblemCountChange={setProblemCount}
+        onRandomize={randomizeProblems}
         onError={props.onError}
       ></Options>
 

@@ -16,6 +16,8 @@ interface Props {
   onRandomize: Function;
   participantHandles: string;
   onParticipantHandlesChange: (handles: string) => void;
+  problemCount: number;
+  onProblemCountChange: (count: number) => void;
   onError: (message: string) => void;
 }
 
@@ -101,6 +103,33 @@ const HandlesActions = styled.div`
   margin-top: 8px;
 `;
 
+const CountField = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: 6px;
+  margin: 0 0 18px 0;
+`;
+
+const NumberInput = styled.input`
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 140px;
+  padding: 8px 10px;
+  color: ${theme.text};
+  background-color: ${theme.background};
+  border: 1px solid ${theme.border};
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+
+  &:focus {
+    outline: none;
+    border-color: ${theme.accent};
+    box-shadow: 0 0 14px ${theme.glowSoft};
+  }
+`;
+
 const HiddenFileInput = styled.input`
   display: none;
 `;
@@ -156,6 +185,30 @@ const Options: React.FC<Props> = (props: Props): ReactElement => {
         maxRating={rating.max}
         onChange={setRating}
       ></Slider>
+
+      <CountField>
+        <HandlesLabel htmlFor="randomizer-problem-count">
+          Number of problems
+        </HandlesLabel>
+        <NumberInput
+          id="randomizer-problem-count"
+          type="number"
+          min={1}
+          max={50}
+          value={props.problemCount}
+          onChange={(event) =>
+            props.onProblemCountChange(
+              Math.max(
+                1,
+                Math.min(50, Math.floor(Number(event.target.value) || 1)),
+              ),
+            )
+          }
+        ></NumberInput>
+        <HandlesHint>
+          How many problems to add in one Randomize press (1–50).
+        </HandlesHint>
+      </CountField>
 
       <HandlesContainer>
         <HandlesHeader>
