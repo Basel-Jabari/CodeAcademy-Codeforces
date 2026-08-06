@@ -34,8 +34,6 @@ const Pane = styled.div`
   gap: 16px;
   min-width: 0;
   width: 100%;
-  max-width: 820px;
-  margin: 0 auto;
 `;
 
 const PaneHead = styled.div`
