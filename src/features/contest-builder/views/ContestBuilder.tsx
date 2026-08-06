@@ -23,11 +23,13 @@ import {
 import { downloadJson } from "../../../lib/export/domain/jsonFile";
 import { downloadExcelSheets } from "../../../lib/export/domain/excelExport";
 import ProblemLinkText from "../../../lib/ui/common/ProblemLinkText";
+import ResetTabButton from "../../../lib/ui/common/ResetTabButton";
 import theme from "../../../lib/theme/theme";
 import { usePersistentState } from "../../../lib/storage/domain/persistentState";
 
 interface Props {
   onError: (message: string) => void;
+  onReset: () => void;
 }
 
 interface ContestSlot {
@@ -940,6 +942,7 @@ const ContestBuilder: React.FC<Props> = (props: Props): ReactElement => {
           Empty contest → add slots with their own randomizer rules → Generate
         </PaneSubtitle>
         <Actions>
+          <ResetTabButton onClick={props.onReset}></ResetTabButton>
           <OutlineButton
             type="button"
             onClick={() => setSlots(slots.concat(newSlot()))}
