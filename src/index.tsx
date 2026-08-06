@@ -2,6 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import {dropOutdatedState} from './services/storage';
+
+dropOutdatedState();
 
 ReactDOM.render(
   <React.StrictMode>

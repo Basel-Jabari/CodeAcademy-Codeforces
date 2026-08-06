@@ -224,6 +224,11 @@ class Parser {
       return createExprNode("NOT", [this.parseUnary()]);
     }
 
+    if (this.isOperator("OPTIONAL")) {
+      this.advance();
+      return createExprNode("OPTIONAL", [this.parseUnary()]);
+    }
+
     return this.parsePrimary();
   }
 
