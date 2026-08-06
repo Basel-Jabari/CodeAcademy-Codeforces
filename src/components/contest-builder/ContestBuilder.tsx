@@ -23,11 +23,13 @@ import {
 import { downloadJson } from "../../services/jsonFile";
 import { downloadExcelSheets } from "../../services/excelExport";
 import ProblemLinkText from "../common/ProblemLinkText";
+import ResetTabButton from "../common/ResetTabButton";
 import theme from "../../theme";
 import { usePersistentState } from "../../services/persistentState";
 
 interface Props {
   onError: (message: string) => void;
+  onReset: () => void;
 }
 
 interface ContestSlot {
@@ -169,7 +171,7 @@ const Pane = styled.div`
   gap: 16px;
   min-width: 0;
   width: 100%;
-  max-width: 1100px;
+  max-width: 1180px;
   margin: 0 auto;
 `;
 
@@ -940,6 +942,7 @@ const ContestBuilder: React.FC<Props> = (props: Props): ReactElement => {
           Empty contest → add slots with their own randomizer rules → Generate
         </PaneSubtitle>
         <Actions>
+          <ResetTabButton onClick={props.onReset}></ResetTabButton>
           <OutlineButton
             type="button"
             onClick={() => setSlots(slots.concat(newSlot()))}
