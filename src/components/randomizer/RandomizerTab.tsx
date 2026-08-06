@@ -18,6 +18,7 @@ import { usePersistentState } from "../../services/persistentState";
 import ClearButton from "../clear-button/ClearButton";
 import Options from "../options/Options";
 import ExpressionBuilder from "../expression/ExpressionBuilder";
+import ResetTabButton from "../common/ResetTabButton";
 import theme from "../../theme";
 
 interface Props {
@@ -26,6 +27,7 @@ interface Props {
     problemStatistics: ProblemStatistics;
   }>;
   onError: (message: string) => void;
+  onReset: () => void;
 }
 
 const Pane = styled.div`
@@ -40,6 +42,7 @@ const Pane = styled.div`
 
 const PaneHead = styled.div`
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   gap: 10px;
   padding-bottom: 8px;
@@ -122,6 +125,7 @@ const RandomizerTab: React.FC<Props> = (props: Props): ReactElement => {
         <PaneSubtitle>
           Build a tag expression, then pull a problem
         </PaneSubtitle>
+        <ResetTabButton onClick={props.onReset}></ResetTabButton>
       </PaneHead>
 
       <ExpressionBuilder

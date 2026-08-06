@@ -32,12 +32,14 @@ import {
 } from "../../services/contestImport";
 import OutlineButton from "../common/OutlineButton";
 import ProblemLinkText from "../common/ProblemLinkText";
+import ResetTabButton from "../common/ResetTabButton";
 import theme from "../../theme";
 import { usePersistentState } from "../../services/persistentState";
 
 interface Props {
   onError: (message: string) => void;
   onSuccess: (message: string) => void;
+  onReset: () => void;
 }
 
 interface ProblemColumn {
@@ -1586,6 +1588,9 @@ const ProblemCheck: React.FC<Props> = (props: Props): ReactElement => {
             only handles that exist on Codeforces; invalid entries stay in the
             box. Each table sorts and drags independently.
           </Subtitle>
+          <Actions style={{ marginTop: 12 }}>
+            <ResetTabButton onClick={props.onReset}></ResetTabButton>
+          </Actions>
         </div>
 
         <StatsRow>

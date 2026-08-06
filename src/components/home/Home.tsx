@@ -10,6 +10,10 @@ import ContestBuilder from "../contest-builder/ContestBuilder";
 import { Problem } from "../../models/Problem";
 import { ProblemStatistics } from "../../models/ProblemStatistics";
 import { usePersistentState } from "../../services/persistentState";
+import {
+  clearProblemsList,
+  clearStateByPrefix,
+} from "../../services/storage";
 
 interface Props {
   initialProblemsList: Array<{
@@ -50,6 +54,12 @@ const appTabs: AppTab[] = [
   "contestBuilder",
 ];
 
+const tabStoragePrefix: { [key in AppTab]: string } = {
+  randomizer: "randomizer.",
+  crossAnalysis: "crossAnalysis.",
+  contestBuilder: "contestBuilder.",
+};
+
 function restoreAppTab(value: AppTab): AppTab {
   return appTabs.indexOf(value) === -1 ? "randomizer" : value;
 }
@@ -60,6 +70,11 @@ const Home: React.FC<Props> = (props: Props): ReactElement => {
     "randomizer",
     restoreAppTab,
   );
+  const [tabMountKeys, setTabMountKeys] = useState<{ [key in AppTab]: number }>({
+    randomizer: 0,
+    crossAnalysis: 0,
+    contestBuilder: 0,
+  });
   const [snackContent, setSnackContent] = useState<string>("");
   const [snackType, setSnackType] = useState<NotifyType>("error");
   const [visible, setVisible] = useState<boolean>(false);
@@ -76,6 +91,15 @@ const Home: React.FC<Props> = (props: Props): ReactElement => {
     setVisible(true);
   };
 
+  const resetTab = (which: AppTab): void => {
+    clearStateByPrefix(tabStoragePrefix[which]);
+    if (which === "randomizer") clearProblemsList();
+    setTabMountKeys((keys) => ({
+      ...keys,
+      [which]: keys[which] + 1,
+    }));
+  };
+
   return (
     <Page>
       <Header></Header>
@@ -87,8 +111,12 @@ const Home: React.FC<Props> = (props: Props): ReactElement => {
           aria-hidden={tab !== "randomizer"}
         >
           <RandomizerTab
-            initialProblemsList={props.initialProblemsList}
+            key={tabMountKeys.randomizer}
+            initialProblemsList={
+              tabMountKeys.randomizer === 0 ? props.initialProblemsList : []
+            }
             onError={triggerError}
+            onReset={() => resetTab("randomizer")}
           ></RandomizerTab>
         </TabPane>
 
@@ -97,8 +125,10 @@ const Home: React.FC<Props> = (props: Props): ReactElement => {
           aria-hidden={tab !== "crossAnalysis"}
         >
           <ProblemCheck
+            key={tabMountKeys.crossAnalysis}
             onError={triggerError}
             onSuccess={triggerSuccess}
+            onReset={() => resetTab("crossAnalysis")}
           ></ProblemCheck>
         </TabPane>
 
@@ -106,7 +136,11 @@ const Home: React.FC<Props> = (props: Props): ReactElement => {
           $active={tab === "contestBuilder"}
           aria-hidden={tab !== "contestBuilder"}
         >
-          <ContestBuilder onError={triggerError}></ContestBuilder>
+          <ContestBuilder
+            key={tabMountKeys.contestBuilder}
+            onError={triggerError}
+            onReset={() => resetTab("contestBuilder")}
+          ></ContestBuilder>
         </TabPane>
       </Content>
 
