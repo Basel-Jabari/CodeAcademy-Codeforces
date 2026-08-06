@@ -1,13 +1,21 @@
 import React, { ReactElement, useState } from "react";
 import styled from "styled-components";
-import Header from "./layout/header/Header";
+import BrandHeader from "./layout/header/BrandHeader";
 import Snackbar from "./layout/snackbar/Snackbar";
 import Footer from "./layout/footer/Footer";
-import TabBar, { AppTab } from "./layout/tabs/TabBar";
+import ServiceNavigation, {
+  AppTab,
+} from "./layout/navigation/ServiceNavigation";
 import RandomizerTab from "../features/randomizer";
 import ProblemCheck from "../features/cross-analysis";
 import ContestBuilder from "../features/contest-builder";
 import { Problem } from "../lib/models/Problem";
+import {
+  ChapterAtmosphere,
+  ChapterBanner,
+  ChapterStage,
+} from "./layout/effects/ChapterExperience";
+import { themeVariables } from "./theme/themePalettes";
 import { ProblemStatistics } from "../lib/models/ProblemStatistics";
 import { usePersistentState } from "../lib/storage/domain/persistentState";
 
@@ -25,10 +33,18 @@ const Page = styled.div`
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--cf-text);
+  background-color: var(--cf-bg);
+  transition: color 0.7s ease, background-color 0.7s ease;
 `;
 
 const Content = styled.div`
   flex: 1;
+  position: relative;
+  z-index: 2;
   box-sizing: border-box;
   width: 100%;
   max-width: 1920px;
@@ -77,37 +93,41 @@ const Home: React.FC<Props> = (props: Props): ReactElement => {
   };
 
   return (
-    <Page>
-      <Header></Header>
-      <TabBar active={tab} onChange={setTab}></TabBar>
+    <Page style={themeVariables(tab) as React.CSSProperties} data-theme={tab}>
+      <ChapterAtmosphere kind={tab}></ChapterAtmosphere>
+      <BrandHeader></BrandHeader>
+      <ServiceNavigation active={tab} onChange={setTab}></ServiceNavigation>
+      <ChapterBanner kind={tab}></ChapterBanner>
 
       <Content>
-        <TabPane
-          $active={tab === "randomizer"}
-          aria-hidden={tab !== "randomizer"}
-        >
-          <RandomizerTab
-            initialProblemsList={props.initialProblemsList}
-            onError={triggerError}
-          ></RandomizerTab>
-        </TabPane>
+        <ChapterStage kind={tab}>
+          <TabPane
+            $active={tab === "randomizer"}
+            aria-hidden={tab !== "randomizer"}
+          >
+            <RandomizerTab
+              initialProblemsList={props.initialProblemsList}
+              onError={triggerError}
+            ></RandomizerTab>
+          </TabPane>
 
-        <TabPane
-          $active={tab === "crossAnalysis"}
-          aria-hidden={tab !== "crossAnalysis"}
-        >
-          <ProblemCheck
-            onError={triggerError}
-            onSuccess={triggerSuccess}
-          ></ProblemCheck>
-        </TabPane>
+          <TabPane
+            $active={tab === "crossAnalysis"}
+            aria-hidden={tab !== "crossAnalysis"}
+          >
+            <ProblemCheck
+              onError={triggerError}
+              onSuccess={triggerSuccess}
+            ></ProblemCheck>
+          </TabPane>
 
-        <TabPane
-          $active={tab === "contestBuilder"}
-          aria-hidden={tab !== "contestBuilder"}
-        >
-          <ContestBuilder onError={triggerError}></ContestBuilder>
-        </TabPane>
+          <TabPane
+            $active={tab === "contestBuilder"}
+            aria-hidden={tab !== "contestBuilder"}
+          >
+            <ContestBuilder onError={triggerError}></ContestBuilder>
+          </TabPane>
+        </ChapterStage>
       </Content>
 
       <Footer></Footer>

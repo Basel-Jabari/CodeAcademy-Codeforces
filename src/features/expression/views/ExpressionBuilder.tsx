@@ -47,7 +47,7 @@ const Card = styled.div`
   background: linear-gradient(
     170deg,
     ${theme.surface} 0%,
-    rgba(7, 11, 20, 0.85) 120%
+    ${theme.background} 120%
   );
   border: 1px solid ${theme.border};
   border-radius: 14px;
@@ -96,7 +96,7 @@ const ExpressionInput = styled.input<{ $edited: boolean }>`
   font: inherit;
   font-size: 13px;
   color: ${theme.text};
-  background-color: rgba(7, 11, 20, 0.7);
+  background-color: ${theme.background};
   border: 1px solid
     ${(props) => (props.$edited ? theme.accent : theme.borderBright)};
   border-left: 3px solid
@@ -145,7 +145,7 @@ const BlockRow = styled.div`
 const Block = styled.div<{ $accent: string }>`
   padding: 6px 12px;
   color: ${(props) => props.$accent};
-  background-color: rgba(7, 11, 20, 0.6);
+  background-color: ${theme.background};
   border: 1px solid ${(props) => props.$accent};
   border-radius: 7px;
   font-size: 11px;
@@ -155,7 +155,7 @@ const Block = styled.div<{ $accent: string }>`
   transition: 0.2s;
 
   &:hover {
-    background-color: rgba(61, 155, 255, 0.1);
+    background-color: ${theme.glowSoft};
     box-shadow: 0 0 12px ${theme.glowSoft};
   }
 `;
@@ -166,7 +166,7 @@ const TagSearch = styled.input`
   margin-bottom: 8px;
   padding: 8px 10px;
   color: ${theme.text};
-  background-color: rgba(7, 11, 20, 0.7);
+  background-color: ${theme.background};
   border: 1px solid ${theme.border};
   border-radius: 8px;
   font: inherit;
@@ -190,7 +190,7 @@ const TagPalette = styled.div`
   max-height: 148px;
   overflow-y: auto;
   padding: 8px;
-  background-color: rgba(7, 11, 20, 0.5);
+  background-color: ${theme.background};
   border: 1px solid ${theme.border};
   border-radius: 9px;
 
